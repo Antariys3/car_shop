@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список машин</title>
+</head>
+<body>
+    <h1>Список доступных машин</h1>
+    <h3>Выберете клиента и количество машин для заказа</h3>
+    <form method="post" action="{% url 'cars_list' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Добавить в корзину</button>
+    </form>
+</body>
+</html>
