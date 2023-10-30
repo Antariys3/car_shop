@@ -40,3 +40,7 @@ class CarsList(forms.Form):
                 cleaned_data[car_type] = int(quantity)
 
         return cleaned_data
+
+
+class OrderList(forms.Form):
+    pass
