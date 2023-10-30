@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ оформлен</title>
+    <style>
+        a {
+            display: block;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+    </style>
+    <style>
+        table {
+            width: 55%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Ваш заказ успешно оформлен</h2>
+{#<a href="{% url 'home' %}">перейти в корзину</a>#}
+<a href="{% url 'home' %}">Главная страница</a>
+    {% if list_orders %}
+     <table>
+        <tr>
+            <th style="width: 5%;">ID</th>
+            <th style="width: 10%;">Клиент</th>
+        </tr>
+        {% for order in list_orders %}
+            <tr>
+                <td><a href="{% url 'order_edit' order.id %}">{{ order.id }}</a></td>
+                <td>{{ order.client }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>В корзине нет заказов.</p>
+{% endif %}
+</body>
+</html>
