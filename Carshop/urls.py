@@ -17,10 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from carshop.views import index, cars_list
+from carshop.views import index, cars_list, orders_page, order_edit
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='home'),
     path('cars_list/', cars_list, name='cars_list'),
+    path('orders_page/', orders_page, name='orders_page'),
+    path('order_edit/', order_edit, name='order_edit'),
 ]

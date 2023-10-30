@@ -24,3 +24,19 @@ class CarsList(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'}),
         label='Выберите клиента'
     )
+
+    def clean_client(self):
+        client = self.cleaned_data.get('client')
+        if not client:
+            raise forms.ValidationError("Выберите клиента")
+        return client
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        for car_type in self.car_types:
+            quantity = cleaned_data.get(car_type)
+            if quantity is not None:
+                cleaned_data[car_type] = int(quantity)
+
+        return cleaned_data

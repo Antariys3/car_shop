@@ -42,6 +42,10 @@ class Car(models.Model):
         self.owner = self.blocked_by_order.client
         self.save()
 
+    def add_owner(self, client):
+        self.owner = client
+        self.save()
+
     def __str__(self):
         return self.color
 
