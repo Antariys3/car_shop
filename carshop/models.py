@@ -1,5 +1,7 @@
 from django.db import models
 
+from carshop.faker import fake
+
 
 class Client(models.Model):
     name = models.CharField(max_length=50)
@@ -24,9 +26,13 @@ class Car(models.Model):
     color = models.CharField(max_length=50)
     year = models.IntegerField()
     # заблокирован по приказу
-    blocked_by_order = models.ForeignKey("Order", on_delete=models.SET_NULL, null=True, related_name="reserved_cars")
+    blocked_by_order = models.ForeignKey(
+        "Order", on_delete=models.SET_NULL, null=True, related_name="reserved_cars"
+    )
     # владелец
-    owner = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, related_name="cars")
+    owner = models.ForeignKey(
+        Client, on_delete=models.SET_NULL, null=True, related_name="cars"
+    )
 
     def block(self, order):
         self.blocked_by_order = order
@@ -46,13 +52,26 @@ class Car(models.Model):
         self.owner = client
         self.save()
 
+    def remove_owner(self):
+        self.owner = None
+        self.save()
+
     def __str__(self):
         return self.color
 
 
 class Licence(models.Model):
-    car = models.OneToOneField(Car, on_delete=models.SET_NULL, null=True, related_name="licence")
+    car = models.OneToOneField(
+        Car, on_delete=models.SET_NULL, null=True, related_name="licence"
+    )
     number = models.CharField(max_length=50)
+    order = models.ForeignKey(
+        "Order", on_delete=models.CASCADE, related_name="car_licence"
+    )
+
+    def create_car_number(self):
+        self.number = fake.car_number()
+        self.save()
 
     def __str__(self):
         return self.number
@@ -74,7 +93,9 @@ class Order(models.Model):  # Заказ
 
 
 class OrderQuantity(models.Model):  # Заказанное Количество
-    car_type = models.ForeignKey(CarType, on_delete=models.CASCADE, related_name="order_quantities")
+    car_type = models.ForeignKey(
+        CarType, on_delete=models.CASCADE, related_name="order_quantities"
+    )
     quantity = models.PositiveIntegerField(default=1)
     # Заказ
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="car_types")
