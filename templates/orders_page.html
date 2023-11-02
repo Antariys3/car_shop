@@ -12,7 +12,7 @@
     </style>
     <style>
         table {
-            width: 55%;
+            width: 30%;
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -36,19 +36,20 @@
     </style>
 </head>
 <body>
-    <h2>Ваш заказ успешно оформлен</h2>
-{#<a href="{% url 'home' %}">перейти в корзину</a>#}
+<h2>Заказы</h2>
 <a href="{% url 'home' %}">Главная страница</a>
     {% if list_orders %}
      <table>
         <tr>
-            <th style="width: 5%;">ID</th>
+            <th style="width: 10%;">Номер заказа</th>
             <th style="width: 10%;">Клиент</th>
+            <th style="width: 5%;">Редактирование</th>
         </tr>
         {% for order in list_orders %}
             <tr>
-                <td><a href="{% url 'order_edit' order.id %}">{{ order.id }}</a></td>
+                <td><a href="{% url 'order_detail' order.id %}">{{ order.id }}</a></td>
                 <td>{{ order.client }}</td>
+                <td><a href="{% url 'delete_order' order.id %}">Удалить заказ</a></td>
             </tr>
         {% endfor %}
     </table>
