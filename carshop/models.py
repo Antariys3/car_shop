@@ -25,11 +25,9 @@ class Car(models.Model):
     car_type = models.ForeignKey(CarType, on_delete=models.CASCADE)
     color = models.CharField(max_length=50)
     year = models.IntegerField()
-    # заблокирован по приказу
     blocked_by_order = models.ForeignKey(
         "Order", on_delete=models.SET_NULL, null=True, related_name="reserved_cars"
     )
-    # владелец
     owner = models.ForeignKey(
         Client, on_delete=models.SET_NULL, null=True, related_name="cars"
     )
@@ -86,16 +84,14 @@ class Dealership(models.Model):
         return self.name
 
 
-class Order(models.Model):  # Заказ
+class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="orders")
-    # оплачено
     is_paid = models.BooleanField(default=False)
 
 
-class OrderQuantity(models.Model):  # Заказанное Количество
+class OrderQuantity(models.Model):
     car_type = models.ForeignKey(
         CarType, on_delete=models.CASCADE, related_name="order_quantities"
     )
     quantity = models.PositiveIntegerField(default=1)
-    # Заказ
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="car_types")
