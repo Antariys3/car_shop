@@ -18,6 +18,7 @@ def cars_list(request):
         return render(request, "cars_list.html", {"form": form})
 
     form = CarsList(request.POST)
+    form.car_types = CarType.objects.values_list("name", flat=True).distinct()
     if form.is_valid():
         client = form.cleaned_data["client"]
         order = Order.objects.create(client=client)
