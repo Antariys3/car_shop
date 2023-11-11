@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load bootstrap5 %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Default Title{% endblock %}</title>
+
+    {# Load Bootstrap CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+
+    <style>
+        a {
+            display: block;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+    </style>
+    <style>
+        .custom-container {
+            max-width: 30%;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: auto;
+        }
+    </style>
+    <style>
+        .base-table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .base-table, .base-table th, .base-table td {
+            border: 1px solid #ccc;
+        }
+
+        .base-table th, .base-table td {
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .base-table th {
+            background-color: #f2f2f2;
+        }
+
+        .base-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table-style-1 {
+            width: 60%;
+        }
+
+        .table-style-2 {
+            width: 40%;
+        }
+
+        .table-style-3 {
+            width: 25%;
+        }
+    </style>
+
+</head>
+<body>
+<header class="p-3 bg-dark text-white">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Домой</a></li>
+                <li><a href="{% url 'cars_list' %}" class="nav-link px-2 text-white">Магазин</a>
+                </li>
+                <li><a href="{% url 'orders_page' %}" class="nav-link px-2 text-white">Заказы</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+{% block content %}{% endblock %}
+</body>
+</html>
