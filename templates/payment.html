@@ -1,41 +1,12 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Оплата заказа</title>
-    <style>
-        table {
-            width: 25%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+{% extends "base.html" %}
 
-        table, th, td {
-            border: 1px solid #ccc;
-        }
+{% block title %}Оплата заказа{% endblock %}
 
-        th, td {
-            padding: 8px 12px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
-    <h2>Заказ №{{ order_id }} оплачен</h2>
-    <a href="{% url 'home' %}">Главная страница</a>
-    <h3>Выданы регистрационные номера</h3>
+{% block content %}
+    <h3>Заказ №{{ order_id }} оплачен</h3> <br>
+    <h5>Выданы регистрационные номера</h5>
     {% if licenses %}
-        <table>
+        <table class="base-table table-style-3">
             <tr>
                 <th style="width: 20%;">ID машины</th>
                 <th style="width: 40%;">Регистрационные номер</th>
@@ -50,5 +21,4 @@
     {% else %}
         <p>Нет лицензий для оплаты.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}
