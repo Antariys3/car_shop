@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .faker import fake
-from .forms import CarsList
+from .forms import CarsList, CreateCarsForm
 from .models import Order, CarType, OrderQuantity, Car, Licence
 
 
@@ -83,3 +83,30 @@ def delete_order(request, order_id):
 def payment(request, order_id):
     licenses = Licence.objects.filter(order_id=order_id)
     return render(request, "payment.html", {"licenses": licenses, "order_id": order_id})
+
+
+def create_cars(request):
+    if request.method == "GET":
+        form = CreateCarsForm()
+        return render(request, "create_cars.html", {"form": form})
+    form = CreateCarsForm(request.POST)
+    if form.is_valid():
+        brand = form.cleaned_data["brand"]
+        name = form.cleaned_data["name"]
+        price = form.cleaned_data["price"]
+        color = form.cleaned_data['color']
+        year = form.cleaned_data['year']
+        quantity = form.cleaned_data["quantity"]
+
+        for _ in range(quantity):
+            car_type = CarType.objects.create(brand=brand, name=name, price=price)
+            car = Car(
+                car_type=car_type,
+                color=color,
+                year=year
+            )
+            car.save()
+        return redirect("cars_list")
+    return render(request, "create_cars.html", {"form": form})
+
+
