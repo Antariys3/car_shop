@@ -77,6 +77,11 @@
                 <li><a href="{% url 'orders_page' %}" class="nav-link px-2 text-white">Заказы</a></li>
                 <li><a href="{% url 'create_cars' %}" class="nav-link px-2 text-white">Добавить машины</a></li>
             </ul>
+            <div class="text-end">
+                <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Авторизоваться</a>
+                <a href="{% url 'register' %}" class="btn btn-info">Зарегистрироваться</a>
+                <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
+            </div>
         </div>
     </div>
 </header>
