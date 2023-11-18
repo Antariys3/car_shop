@@ -23,7 +23,7 @@ from carshop.views import (
     orders_page,
     order_detail,
     delete_order,
-    payment,
+    payment, create_cars,
 )
 
 urlpatterns = [
@@ -34,4 +34,5 @@ urlpatterns = [
     path("order/<int:pk>/", order_detail, name="order_detail"),
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
     path("payment/<int:order_id>/", payment, name="payment"),
+    path("create_cars/", create_cars, name="create_cars"),
 ]
