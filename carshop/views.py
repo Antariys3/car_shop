@@ -1,3 +1,5 @@
+from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .faker import fake
@@ -6,10 +8,7 @@ from .models import Order, CarType, OrderQuantity, Car, Licence
 
 
 def index(request):
-    return render(
-        request,
-        "index.html",
-    )
+    return render(request, "index.html", {"user": request.user})
 
 
 def cars_list(request):
@@ -110,3 +109,17 @@ def create_cars(request):
     return render(request, "create_cars.html", {"form": form})
 
 
+def register(request):
+    if request.method == "GET":
+        form = UserCreationForm()
+        return render(request, "registration/register.html", {"form": form})
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect("login")
+    return render(request, "registration/register.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")

@@ -79,7 +79,7 @@ class CreateCarsForm(ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         validators=[
             MinValueValidator(0, message="Количество машин должно быть положительным"),
-            MaxValueValidator(50, message="Максимум 50 машин"),
+            MaxValueValidator(20, message="Максимум 20 машин"),
         ],
     )
 
@@ -95,7 +95,7 @@ class CreateCarsForm(ModelForm):
         }
 
         widgets = {
-                "brand": forms.TextInput(attrs={"class": "form-control"}),
-                "name": forms.TextInput(attrs={"class": "form-control"}),
-                "price": forms.NumberInput(attrs={"class": "form-control"}),
-            }
+            "brand": forms.TextInput(attrs={"class": "form-control"}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "price": forms.NumberInput(attrs={"class": "form-control"}),
+        }

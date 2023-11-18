@@ -3,8 +3,11 @@
 {% block title %}Главная страница{% endblock %}
 
 {% block content %}
-    <h1>Главная страница</h1>
-<a href="{% url 'cars_list' %}">Магазин машин</a>
+    <h1>Магазин машин</h1>
+    {% if user and user.is_authenticated  %}
+        <p>Добро пожаловать {{ user }}</p>
+    {% endif %}
+<a href="{% url 'cars_list' %}">Выбрать машины</a>
 <a href="{% url 'orders_page' %}">Заказы</a>
 <a href="{% url 'create_cars' %}">Добавление машин в БД</a>
 
