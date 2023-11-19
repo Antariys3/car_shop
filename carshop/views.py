@@ -164,9 +164,5 @@ def logout_view(request):
     return redirect("home")
 
 
-def password_reset(request):
-    return render(request, "registration/password_reset_form.html")
-
-
 def checking_mail(request):
     return render(request, "registration/mail.html")
