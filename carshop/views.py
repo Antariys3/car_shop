@@ -1,10 +1,10 @@
 from django.contrib.auth import logout
-from django.contrib.auth.forms import UserCreationForm, User
-from django.contrib.auth.views import LoginView, PasswordResetView
+from django.contrib.auth.forms import User
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.core.signing import Signer, BadSignature
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from .faker import fake
@@ -38,14 +38,14 @@ def activate(request, user_signed):
     try:
         user_id = Signer().unsign(user_signed)
     except BadSignature:
-        return redirect('login')
+        return redirect("login")
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
-        return redirect('login')
+        return redirect("login")
     user.is_active = True
     user.save()
-    return redirect('login')
+    return redirect("login")
 
 
 def index(request):
