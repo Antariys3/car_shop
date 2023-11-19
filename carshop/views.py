@@ -124,7 +124,7 @@ def payment(request, order_id):
     licenses = Licence.objects.filter(order_id=order_id)
     return render(request, "payment.html", {"licenses": licenses, "order_id": order_id})
 
-
+# 333antar333gmail.com An%Tariys33
 def create_cars(request):
     if request.method == "GET":
         form = CreateCarsForm()
