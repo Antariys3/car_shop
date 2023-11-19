@@ -1,10 +1,51 @@
 from django.contrib.auth import logout
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, User
+from django.contrib.auth.views import LoginView, PasswordResetView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.mail import send_mail
+from django.core.signing import Signer, BadSignature
+from django.urls import reverse_lazy
 
 from .faker import fake
-from .forms import CarsList, CreateCarsForm
+from .forms import CarsList, CreateCarsForm, UserCreationFormWithEmail
 from .models import Order, CarType, OrderQuantity, Car, Licence
+
+
+def send_activation_email(request, user: User):
+    user_signed = Signer().sign(user.id)
+    signer_url = request.build_absolute_uri(f"/activate/{user_signed}")
+    send_mail(
+        "Registration complete",
+        f"Click here to activate your account: {signer_url}",
+        "juliy14497@outlook.com",
+        [user.email],
+        fail_silently=False,
+    )
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    success_message = (
+        "We've emailed you instructions for setting your password, "
+        "if an account exists with the email you entered. You should receive them shortly."
+        " If you don't receive an email, "
+        "please make sure you've entered the address you registered with, and check your spam folder."
+    )
+    success_url = reverse_lazy("login")
+
+
+def activate(request, user_signed):
+    try:
+        user_id = Signer().unsign(user_signed)
+    except BadSignature:
+        return redirect('login')
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return redirect('login')
+    user.is_active = True
+    user.save()
+    return redirect('login')
 
 
 def index(request):
@@ -93,17 +134,13 @@ def create_cars(request):
         brand = form.cleaned_data["brand"]
         name = form.cleaned_data["name"]
         price = form.cleaned_data["price"]
-        color = form.cleaned_data['color']
-        year = form.cleaned_data['year']
+        color = form.cleaned_data["color"]
+        year = form.cleaned_data["year"]
         quantity = form.cleaned_data["quantity"]
 
         for _ in range(quantity):
             car_type = CarType.objects.create(brand=brand, name=name, price=price)
-            car = Car(
-                car_type=car_type,
-                color=color,
-                year=year
-            )
+            car = Car(car_type=car_type, color=color, year=year)
             car.save()
         return redirect("cars_list")
     return render(request, "create_cars.html", {"form": form})
@@ -111,11 +148,13 @@ def create_cars(request):
 
 def register(request):
     if request.method == "GET":
-        form = UserCreationForm()
+        form = UserCreationFormWithEmail()
         return render(request, "registration/register.html", {"form": form})
-    form = UserCreationForm(request.POST)
+    form = UserCreationFormWithEmail(request.POST)
     if form.is_valid():
+        form.instance.is_active = False
         form.save()
+        send_activation_email(request, form.instance)
         return redirect("login")
     return render(request, "registration/register.html", {"form": form})
 
@@ -123,3 +162,11 @@ def register(request):
 def logout_view(request):
     logout(request)
     return redirect("home")
+
+
+def password_reset(request):
+    return render(request, "registration/password_reset_form.html")
+
+
+def checking_mail(request):
+    return render(request, "registration/mail.html")
