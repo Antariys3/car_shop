@@ -15,7 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import (
+    LoginView,
+    PasswordResetConfirmView,
+)
 from django.urls import path
 
 from carshop.views import (
@@ -24,8 +27,19 @@ from carshop.views import (
     orders_page,
     order_detail,
     delete_order,
-    payment, create_cars, register, logout_view,
+    payment,
+    create_cars,
+    register,
+    logout_view,
+    activate,
+    checking_mail,
+    ResetPasswordView,
 )
+
+
+class ResetView:
+    pass
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -36,7 +50,18 @@ urlpatterns = [
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
     path("payment/<int:order_id>/", payment, name="payment"),
     path("create_cars/", create_cars, name="create_cars"),
-    path("register", register, name="register"),
-    path("login", LoginView.as_view(), name="login"),
+    path("register/", register, name="register"),
+    path("login/", LoginView.as_view(), name="login"),
     path("logout", logout_view, name="logout"),
+    path("activate/<user_signed>", activate, name="activate"),
+    path("checking_mail/", checking_mail, name="checking_mail"),
+    path("password_reset/", ResetPasswordView.as_view(), name="password_reset"),
+    path(
+        "forgot_password/confirm/<uidb64>/<token>/",
+        PasswordResetConfirmView.as_view(
+            template_name="registration/password_reset_confirm.html",
+            success_url="/login/",
+        ),
+        name="password_reset_confirm",
+    ),
 ]
