@@ -7,6 +7,7 @@ from django.core.signing import Signer, BadSignature
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
+from Car_shop import settings
 from .faker import fake
 from .forms import CarsList, CreateCarsForm, UserCreationFormWithEmail
 from .models import Order, CarType, OrderQuantity, Car, Licence
@@ -18,7 +19,7 @@ def send_activation_email(request, user: User):
     send_mail(
         "Registration complete",
         f"Click here to activate your account: {signer_url}",
-        "juliy14497@outlook.com",
+        f"{settings.DEFAULT_FROM_EMAIL}",
         [user.email],
         fail_silently=False,
     )
@@ -46,6 +47,28 @@ def activate(request, user_signed):
     user.is_active = True
     user.save()
     return redirect("login")
+
+
+def register(request):
+    if request.method == "GET":
+        form = UserCreationFormWithEmail()
+        return render(request, "registration/register.html", {"form": form})
+    form = UserCreationFormWithEmail(request.POST)
+    if form.is_valid():
+        form.instance.is_active = False
+        form.save()
+        send_activation_email(request, form.instance)
+        return redirect("login")
+    return render(request, "registration/register.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
+
+
+def checking_mail(request):
+    return render(request, "registration/mail.html")
 
 
 def index(request):
@@ -144,25 +167,3 @@ def create_cars(request):
             car.save()
         return redirect("cars_list")
     return render(request, "create_cars.html", {"form": form})
-
-
-def register(request):
-    if request.method == "GET":
-        form = UserCreationFormWithEmail()
-        return render(request, "registration/register.html", {"form": form})
-    form = UserCreationFormWithEmail(request.POST)
-    if form.is_valid():
-        form.instance.is_active = False
-        form.save()
-        send_activation_email(request, form.instance)
-        return redirect("login")
-    return render(request, "registration/register.html", {"form": form})
-
-
-def logout_view(request):
-    logout(request)
-    return redirect("home")
-
-
-def checking_mail(request):
-    return render(request, "registration/mail.html")

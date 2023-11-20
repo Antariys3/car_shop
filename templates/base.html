@@ -90,9 +90,13 @@
                 <li><a href="{% url 'create_cars' %}" class="nav-link px-2 text-white">Добавить машины</a></li>
             </ul>
             <div class="text-end">
-                <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Авторизоваться</a>
-                <a href="{% url 'register' %}" class="btn btn-info">Зарегистрироваться</a>
-                <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
+                {% if request.user.is_authenticated %}
+                    {{ user.username }} &nbsp; &nbsp;
+                    <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-info">Регистрация</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Авторизация</a>
+                {% endif %}
             </div>
         </div>
     </div>
