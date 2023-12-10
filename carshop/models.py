@@ -95,3 +95,9 @@ class OrderQuantity(models.Model):
     )
     quantity = models.PositiveIntegerField(default=1)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="car_types")
+
+
+class CarPhotos(models.Model):
+    name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to="images", blank=True)
+

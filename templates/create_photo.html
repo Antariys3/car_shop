@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo</title>
+</head>
+<body>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <input type="Submit">
+</form>
+{% if car_photo.image %}
+    <p>{{ car_photo.name }}</p>
+    <img src="{{ car_photo.image.url }}">
+{% endif %}
+</body>
+</html>

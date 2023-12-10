@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import logout
 from django.contrib.auth.forms import User
 from django.contrib.auth.views import PasswordResetView
@@ -9,8 +11,8 @@ from django.urls import reverse_lazy
 
 from Car_shop import settings
 from .faker import fake
-from .forms import CarsList, CreateCarsForm, UserCreationFormWithEmail
-from .models import Order, CarType, OrderQuantity, Car, Licence
+from .forms import CarsList, CreateCarsForm, UserCreationFormWithEmail, CreateCarPhotoForm
+from .models import Order, CarType, OrderQuantity, Car, Licence, CarPhotos
 
 
 def send_activation_email(request, user: User):
@@ -167,3 +169,21 @@ def create_cars(request):
             car.save()
         return redirect("cars_list")
     return render(request, "create_cars.html", {"form": form})
+
+
+def create_car_photo(request):
+    if request.method == "GET":
+        form = CreateCarPhotoForm()
+        return render(request, "create_photo.html", {"form": form})
+    form = CreateCarPhotoForm(request.POST, request.FILES)
+    if form.is_valid():
+        name = form.cleaned_data["name"]
+        print(name)
+        photo = form.cleaned_data["image"]
+        print(photo)
+
+        car_photo = CarPhotos()
+        car_photo.name = name
+        car_photo.image.save(uuid.uuid4().hex, photo)
+        return render(request, "create_photo.html", {"car_photo": car_photo})
+    return render(request, "create_photo.html", {"form": form})

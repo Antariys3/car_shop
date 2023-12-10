@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.forms import ModelForm
 
-from .models import CarType, Car, Client
+from .models import CarType, Car, Client, CarPhotos
 
 
 class CarsList(forms.Form):
@@ -136,3 +136,14 @@ class UserCreationFormWithEmail(UserCreationForm):
                 "Пользователь с таким email уже зарегистрирован."
             )
         return email
+
+
+class CreateCarPhotoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = CarPhotos
+        fields = ["name", "image"]
+        labels = {"name": "Бренд", "image": "Фото машины"}
+        widgets = {"name": forms.TextInput(attrs={"class": "form-control"})}
