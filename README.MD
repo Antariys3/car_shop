@@ -15,14 +15,23 @@ docker run -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
 python manage.py migrate
 ```
 
-4. Set you SENDGRID_API_KEY and DEFAULT_FROM_EMAIL environment variables.
+4. Set the environment variables (needed for registration and login)
+SENDGRID_API_KEY and DEFAULT_FROM_EMAIL.
 
 ```
 export SENDGRID_API_KEY='foo'
 export DEFAULT_FROM_EMAIL='foo'
 ```
 
-5. Run Django web server.
+5. Set the environment variables (needed for registration and login via Google)
+GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.
+
+```
+export GOOGLE_CLIENT_ID='foo'
+export GOOGLE_CLIENT_SECRET='foo'
+```
+
+6. Run Django web server.
 
 ```
 python manage.py runserver
