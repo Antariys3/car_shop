@@ -35,8 +35,7 @@ from carshop.views import (
     logout_view,
     activate,
     checking_mail,
-    ResetPasswordView,
-    create_car_photo,
+    ResetPasswordView, create_car_photo,
 )
 
 
@@ -67,8 +66,5 @@ urlpatterns = [
         ),
         name="password_reset_confirm",
     ),
-    path("create_photo/", create_car_photo, name="create_photo")
+    path("photo_cars/", create_car_photo, name="create_car_photo")
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

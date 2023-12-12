@@ -154,7 +154,7 @@ def create_cars(request):
     if request.method == "GET":
         form = CreateCarsForm()
         return render(request, "create_cars.html", {"form": form})
-    form = CreateCarsForm(request.POST)
+    form = CreateCarsForm(request.POST, request.FILES)
     if form.is_valid():
         brand = form.cleaned_data["brand"]
         name = form.cleaned_data["name"]
@@ -162,9 +162,12 @@ def create_cars(request):
         color = form.cleaned_data["color"]
         year = form.cleaned_data["year"]
         quantity = form.cleaned_data["quantity"]
+        image = form.cleaned_data["image"]
+        print(image)
 
         for _ in range(quantity):
             car_type = CarType.objects.create(brand=brand, name=name, price=price)
+            car_type.image.save(f"{image}", image)
             car = Car(car_type=car_type, color=color, year=year)
             car.save()
         return redirect("cars_list")

@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.forms import ModelForm
+from django.forms import ModelForm, ClearableFileInput
 
 from .models import CarType, Car, Client, CarPhotos
 
@@ -89,19 +89,27 @@ class CreateCarsForm(ModelForm):
 
     class Meta:
         model = CarType
-        fields = ["brand", "name", "price"]
+        fields = ["brand", "name", "price", "image"]
 
         labels = {
             "brand": "Бренд",
             "name": "Марка",
             "price": "Цена",
+            "image": "Выберите фото"
         }
 
         widgets = {
             "brand": forms.TextInput(attrs={"class": "form-control"}),
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }
+
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        if not image:
+            raise forms.ValidationError("Не выбрана фотография машины")
+        return image
 
 
 class UserCreationFormWithEmail(UserCreationForm):
@@ -147,3 +155,9 @@ class CreateCarPhotoForm(forms.ModelForm):
         fields = ["name", "image"]
         labels = {"name": "Бренд", "image": "Фото машины"}
         widgets = {"name": forms.TextInput(attrs={"class": "form-control"})}
+
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        if not image:
+            raise forms.ValidationError("Не выбрана фотография машины")
+        return image
