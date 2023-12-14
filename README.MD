@@ -14,15 +14,23 @@ docker run -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
 ```
 python manage.py migrate
 ```
+4. Set environment variables for working with the database AWS Amazon,
+AWS_STORAGE_BUCKET_NAME, AWS_S3_ACCESS_KEY_ID and AWS_S3_SECRET_ACCESS_KEY.
 
-4. Set you SENDGRID_API_KEY and DEFAULT_FROM_EMAIL environment variables.
+```
+export AWS_STORAGE_BUCKET_NAME="foo"
+export AWS_S3_ACCESS_KEY_ID="foo"
+export AWS_S3_SECRET_ACCESS_KEY="foo"
+```
+
+5. Set you SENDGRID_API_KEY and DEFAULT_FROM_EMAIL environment variables.
 
 ```
 export SENDGRID_API_KEY='foo'
 export DEFAULT_FROM_EMAIL='foo'
 ```
 
-5. Run Django web server.
+6. Run Django web server.
 
 ```
 python manage.py runserver
