@@ -34,6 +34,7 @@ from carshop.views import (
     activate,
     checking_mail,
     ResetPasswordView,
+    image_edit,
 )
 
 
@@ -64,4 +65,5 @@ urlpatterns = [
         ),
         name="password_reset_confirm",
     ),
+    path("image_edit/", image_edit, name="image_edit"),
 ]

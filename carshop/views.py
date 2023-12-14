@@ -4,13 +4,14 @@ from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
 from django.core.signing import Signer, BadSignature
+from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from Car_shop import settings
 from .faker import fake
-from .forms import CarsList, CreateCarsForm, UserCreationFormWithEmail
-from .models import Order, CarType, OrderQuantity, Car, Licence
+from .forms import CreateCarsForm, UserCreationFormWithEmail
+from .models import Order, CarType, OrderQuantity, Car, Licence, Client
 
 
 def send_activation_email(request, user: User):
@@ -76,33 +77,52 @@ def index(request):
 
 
 def cars_list(request):
-    if request.method == "GET":
-        form = CarsList()
-        return render(request, "cars_list.html", {"form": form})
+    clients = Client.objects.all()
+    car_types = (
+        CarType.objects.filter(car__blocked_by_order=None, car__owner=None)
+        .values("brand", "name", "image")
+        .annotate(count=Count("car"))
+    )
+    for car in car_types:
+        car["count"] = [i for i in range(0, car["count"] + 1)]
+        car["car_type"] = CarType.objects.filter(
+            brand=car["brand"], name=car["name"], image=car["image"]
+        ).first()
 
-    form = CarsList(request.POST)
-    form.car_types = CarType.objects.values_list("name", flat=True).distinct()
-    if form.is_valid():
-        client = form.cleaned_data["client"]
+    if request.method == "GET":
+        return render(
+            request,
+            "cars_list.html",
+            {"clients": clients, "car_types": car_types},
+        )
+
+    if request.method == "POST":
+        client_id = request.POST.get("client")
+        client = Client.objects.get(id=client_id)
         order = Order.objects.create(client=client)
 
-        for car_type in form.car_types:
-            quantity = form.cleaned_data[car_type]
+        for car in car_types:
+            brand = car["car_type"].brand
+            name = car["car_type"].name
+            image = car["car_type"].image
+            quantity = int(request.POST.get(f"quantity_{brand}_{name}_{image}"))
+
             if quantity > 0:
-                car_type_obj = CarType.objects.filter(name=car_type).first()
+                car_type_obj = CarType.objects.filter(name=name, image=image).first()
                 OrderQuantity.objects.create(
                     car_type=car_type_obj, quantity=quantity, order=order
                 )
 
-                cars_to_reserve = Car.objects.filter(
-                    car_type__name=car_type_obj.name, blocked_by_order=None
+                reserved_cars = Car.objects.filter(
+                    car_type__name=car_type_obj.name,
+                    car_type__image=car_type_obj.image,
+                    blocked_by_order=None,
                 )[:quantity]
-                for car in cars_to_reserve:
-                    car.block(order)
-                    car.add_owner(client)
+                for reserved_car in reserved_cars:
+                    reserved_car.block(order)
+                    reserved_car.add_owner(client)
 
         return redirect("orders_page")
-    return render(request, "cars_list.html", {"form": form})
 
 
 def orders_page(request):
@@ -139,8 +159,7 @@ def delete_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.delete()
 
-    list_orders = Order.objects.all()
-    return render(request, "orders_page.html", {"list_orders": list_orders})
+    return redirect("orders_page")
 
 
 def payment(request, order_id):
@@ -152,7 +171,7 @@ def create_cars(request):
     if request.method == "GET":
         form = CreateCarsForm()
         return render(request, "create_cars.html", {"form": form})
-    form = CreateCarsForm(request.POST)
+    form = CreateCarsForm(request.POST, request.FILES)
     if form.is_valid():
         brand = form.cleaned_data["brand"]
         name = form.cleaned_data["name"]
@@ -160,10 +179,39 @@ def create_cars(request):
         color = form.cleaned_data["color"]
         year = form.cleaned_data["year"]
         quantity = form.cleaned_data["quantity"]
+        image = form.cleaned_data["image"]
 
         for _ in range(quantity):
             car_type = CarType.objects.create(brand=brand, name=name, price=price)
+            car_type.image.save(f"{image}", image)
             car = Car(car_type=car_type, color=color, year=year)
             car.save()
         return redirect("cars_list")
     return render(request, "create_cars.html", {"form": form})
+
+
+def image_edit(request):
+    car_types = CarType.objects.values("brand", "name", "image").distinct()
+    for car in car_types:
+        car["car_type"] = CarType.objects.filter(
+            brand=car["brand"], name=car["name"], image=car["image"]
+        ).first()
+
+    if request.method == "GET":
+        return render(request, "image_edit.html", {"car_types": car_types})
+
+    if request.method == "POST":
+        for car in car_types:
+            car_type_id = request.POST.get(f'car_type_id_{car["car_type"].id}')
+            image_file = request.FILES.get(f'image_{car["car_type"].id}')
+
+            if car_type_id and image_file:
+                car_type = CarType.objects.get(id=car_type_id)
+                car_types = CarType.objects.filter(
+                    name=car_type.name, image=car_type.image
+                )
+                for car_type in car_types:
+                    car_type.image.delete()
+                    car_type.image.save(f"{image_file}", image_file)
+
+        return redirect("cars_list")

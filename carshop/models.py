@@ -16,6 +16,7 @@ class CarType(models.Model):
     name = models.CharField(max_length=50)
     brand = models.CharField(max_length=50)
     price = models.PositiveIntegerField()
+    image = models.ImageField(upload_to="Images_of_cars", null=True, blank=True)
 
     def __str__(self):
         return f"{self.brand} {self.name}"
@@ -95,3 +96,8 @@ class OrderQuantity(models.Model):
     )
     quantity = models.PositiveIntegerField(default=1)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="car_types")
+
+
+class CarPhotos(models.Model):
+    name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to="images", blank=True)
