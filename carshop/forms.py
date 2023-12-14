@@ -6,11 +6,11 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.forms import ModelForm
 
-from .models import CarType, CarPhotos
+from .models import CarType
 
 
 class CreateCarsForm(ModelForm):
-    colors = ["белый", "черный", "красный", "синий", "зеленый", "желтый"]
+    colors = ["белый", "черный", "металик", "красный", "синий", "зеленый", "желтый"]
 
     color = forms.ChoiceField(
         label="Цвет",

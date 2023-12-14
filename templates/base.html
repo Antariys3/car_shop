@@ -95,6 +95,7 @@
                 <li><a href="{% url 'cars_list' %}" class="nav-link px-2 text-white">Магазин</a></li>
                 <li><a href="{% url 'orders_page' %}" class="nav-link px-2 text-white">Заказы</a></li>
                 <li><a href="{% url 'create_cars' %}" class="nav-link px-2 text-white">Добавить машины</a></li>
+                <li><a href="{% url 'image_edit' %}" class="nav-link px-2 text-white">Изменить фото</a></li>
             </ul>
             <div class="text-end">
                 {% if request.user.is_authenticated %}

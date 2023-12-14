@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth import logout
 from django.contrib.auth.forms import User
 from django.contrib.auth.views import PasswordResetView
@@ -12,10 +10,7 @@ from django.urls import reverse_lazy
 
 from Car_shop import settings
 from .faker import fake
-from .forms import (
-    CreateCarsForm,
-    UserCreationFormWithEmail,
-)
+from .forms import CreateCarsForm, UserCreationFormWithEmail
 from .models import Order, CarType, OrderQuantity, Car, Licence, Client
 
 
@@ -185,7 +180,6 @@ def create_cars(request):
         year = form.cleaned_data["year"]
         quantity = form.cleaned_data["quantity"]
         image = form.cleaned_data["image"]
-        print(image)
 
         for _ in range(quantity):
             car_type = CarType.objects.create(brand=brand, name=name, price=price)
@@ -194,3 +188,30 @@ def create_cars(request):
             car.save()
         return redirect("cars_list")
     return render(request, "create_cars.html", {"form": form})
+
+
+def image_edit(request):
+    car_types = CarType.objects.values("brand", "name", "image").distinct()
+    for car in car_types:
+        car["car_type"] = CarType.objects.filter(
+            brand=car["brand"], name=car["name"], image=car["image"]
+        ).first()
+
+    if request.method == "GET":
+        return render(request, "image_edit.html", {"car_types": car_types})
+
+    if request.method == "POST":
+        for car in car_types:
+            car_type_id = request.POST.get(f'car_type_id_{car["car_type"].id}')
+            image_file = request.FILES.get(f'image_{car["car_type"].id}')
+
+            if car_type_id and image_file:
+                car_type = CarType.objects.get(id=car_type_id)
+                car_types = CarType.objects.filter(
+                    name=car_type.name, image=car_type.image
+                )
+                for car_type in car_types:
+                    car_type.image.delete()
+                    car_type.image.save(f"{image_file}", image_file)
+
+        return redirect("cars_list")
