@@ -9,3 +9,5 @@ __pycache__/
 .idea/
 
 readme_my_data.txt
+venv_l/
+venv_p
