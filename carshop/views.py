@@ -1,75 +1,14 @@
 from django.contrib.auth import logout
-from django.contrib.auth.forms import User
-from django.contrib.auth.views import PasswordResetView
-from django.contrib.messages.views import SuccessMessageMixin
-from django.core.mail import send_mail
-from django.core.signing import Signer, BadSignature
-from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
 
-from Car_shop import settings
 from .faker import fake
-from .forms import CreateCarsForm, UserCreationFormWithEmail
-from .models import Order, CarType, OrderQuantity, Car, Licence, Client
-
-
-def send_activation_email(request, user: User):
-    user_signed = Signer().sign(user.id)
-    signer_url = request.build_absolute_uri(f"/activate/{user_signed}")
-    send_mail(
-        "Registration complete",
-        f"Click here to activate your account: {signer_url}",
-        f"{settings.DEFAULT_FROM_EMAIL}",
-        [user.email],
-        fail_silently=False,
-    )
-
-
-class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
-    success_message = (
-        "We've emailed you instructions for setting your password, "
-        "if an account exists with the email you entered. You should receive them shortly."
-        " If you don't receive an email, "
-        "please make sure you've entered the address you registered with, and check your spam folder."
-    )
-    success_url = reverse_lazy("login")
-
-
-def activate(request, user_signed):
-    try:
-        user_id = Signer().unsign(user_signed)
-    except BadSignature:
-        return redirect("login")
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return redirect("login")
-    user.is_active = True
-    user.save()
-    return redirect("login")
-
-
-def register(request):
-    if request.method == "GET":
-        form = UserCreationFormWithEmail()
-        return render(request, "registration/register.html", {"form": form})
-    form = UserCreationFormWithEmail(request.POST)
-    if form.is_valid():
-        form.instance.is_active = False
-        form.save()
-        send_activation_email(request, form.instance)
-        return redirect("login")
-    return render(request, "registration/register.html", {"form": form})
+from .forms import CarsList, CreateCarsForm
+from .models import Order, CarType, OrderQuantity, Car, Licence
 
 
 def logout_view(request):
     logout(request)
     return redirect("home")
-
-
-def checking_mail(request):
-    return render(request, "registration/mail.html")
 
 
 def index(request):
