@@ -12,3 +12,4 @@ readme_my_data.txt
 venv_l/
 venv_p
 /venv_l/
+/templates/registration/test.html
