@@ -1,9 +1,10 @@
 from django.contrib.auth import logout
+from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .faker import fake
-from .forms import CarsList, CreateCarsForm
-from .models import Order, CarType, OrderQuantity, Car, Licence
+from .forms import CreateCarsForm
+from .models import Order, CarType, OrderQuantity, Car, Licence, Client
 
 
 def logout_view(request):
