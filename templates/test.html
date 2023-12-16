@@ -5,9 +5,9 @@
 {% block content %}
     {% load bootstrap5 %}
 
-    <div class="container-fluid mt-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
+    <div class="container mt-5">
+        <div class="row row-cols-2">
+            <div class="col">
                 <h4>Выберите клиента и количество машин для заказа</h4>
                 <form method="post" enctype="multipart/form-data" class="mb-3">
                     {% csrf_token %}
@@ -19,7 +19,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="row row-cols-1 row-cols-md-3">
+                    <div class="row row-cols-2">
                         {% for car in car_types %}
                             <div class="col mb-3">
                                 <div class="card">

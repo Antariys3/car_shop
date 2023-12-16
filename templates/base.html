@@ -76,6 +76,13 @@
             padding: 0;
             color: #CC0000;
         }
+
+        img.img-article-left {
+            max-width: 300px;
+            height: auto;
+            float: left;
+            padding: 0 10px 10px 0;
+        }
     </style>
 
 </head>
@@ -88,6 +95,7 @@
                 <li><a href="{% url 'cars_list' %}" class="nav-link px-2 text-white">Магазин</a></li>
                 <li><a href="{% url 'orders_page' %}" class="nav-link px-2 text-white">Заказы</a></li>
                 <li><a href="{% url 'create_cars' %}" class="nav-link px-2 text-white">Добавить машины</a></li>
+                <li><a href="{% url 'image_edit' %}" class="nav-link px-2 text-white">Изменить фото</a></li>
             </ul>
             <div class="text-end">
                 {% if request.user.is_authenticated %}
@@ -100,7 +108,9 @@
         </div>
     </div>
 </header>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
 
-{% block content %}{% endblock %}
 </body>
 </html>

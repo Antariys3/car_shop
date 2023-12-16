@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать фото{% endblock %}
+
+{% block content %}
+    {% load bootstrap5 %}
+    <h1>Редактировать изображения автомобилей</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for car in car_types %}
+            <div style="margin-bottom: 20px;">
+                <img src="{{ car.car_type.image.url }}" alt="{{ car.car_type.name }}"
+                     style="max-width: 200px; max-height: 200px;">
+                <h3>{{ car.car_type.brand }} {{ car.car_type.name }}</h3>
+                <input type="file" name="image_{{ car.car_type.id }}" accept="image/*">
+                <input type="hidden" name="car_type_id_{{ car.car_type.id }}" value="{{ car.car_type.id }}">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        {% endfor %}
+    </form>
+{% endblock %}

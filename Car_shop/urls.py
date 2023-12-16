@@ -26,6 +26,7 @@ from carshop.views import (
     payment,
     create_cars,
     logout_view,
+    image_edit,
 )
 
 urlpatterns = [
@@ -39,4 +40,5 @@ urlpatterns = [
     path("create_cars/", create_cars, name="create_cars"),
     path("logout", logout_view, name="logout"),
     path("accounts/", include("allauth.urls"), name="google_login"),
+    path("image_edit/", image_edit, name="image_edit"),
 ]
