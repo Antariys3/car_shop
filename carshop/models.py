@@ -58,6 +58,9 @@ class Car(models.Model):
     def __str__(self):
         return self.color
 
+    class Meta:
+        ordering = ["-id"]
+
 
 class Licence(models.Model):
     car = models.OneToOneField(

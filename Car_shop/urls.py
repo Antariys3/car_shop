@@ -19,25 +19,28 @@ from django.urls import path, include
 
 from carshop.views import (
     index,
-    cars_list,
     orders_page,
-    order_detail,
     delete_order,
     payment,
-    create_cars,
+    sell_cars,
     logout_view,
     image_edit,
+    CarsShopView,
+    CarDetailView,
+    BasketView
+
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", index, name="home"),
-    path("cars_list/", cars_list, name="cars_list"),
+    path("cars_list/", CarsShopView.as_view(), name="cars_list"),
+    path('car/<int:car_id>/', CarDetailView.as_view(), name='car_detail'),
+    path('basket/', BasketView.as_view(), name='basket'),
     path("orders_page/", orders_page, name="orders_page"),
-    path("order/<int:pk>/", order_detail, name="order_detail"),
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
     path("payment/<int:order_id>/", payment, name="payment"),
-    path("create_cars/", create_cars, name="create_cars"),
+    path("sell_cars/", sell_cars, name="sell_cars"),
     path("logout", logout_view, name="logout"),
     path("accounts/", include("allauth.urls"), name="google_login"),
     path("image_edit/", image_edit, name="image_edit"),

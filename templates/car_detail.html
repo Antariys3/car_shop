@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="product-image-item">
+                    <img src="{{ car.car_type.image.url }}" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h1 class="text-center">
+                    {{ car.car_type.brand }} {{ car.car_type.name }}
+                </h1>
+
+                <p class="mb-2">Цвет {{ car.color }}</p>
+                <p class="mb-2">Год {{ car.year }}</p>
+                <p class="mb-2">Цена: {{ car.car_type.price }}</p>
+
+                <form id="form_buying_product" action="{% url 'home' %}" class="mb-3">
+                    {% csrf_token %}
+                    <div class="form-group" style="display: flex; align-items: center;">
+                        <input type="number" class="form-control" name="number" id="number" style="margin-right: 10px; width: 30%;">
+                        <button type="submit" id="submit_btn" class="btn btn-success btn-buy"
+                                data-car_id="{{ car.id }}"
+                                data-name="{{ car.car_type.name }}"
+                                data-price="{{ car.car_type.price }}"
+                        >
+                            Купить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

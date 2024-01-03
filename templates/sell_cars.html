@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Создание машин{% endblock %}
+
+{% block content %}
+    {% load bootstrap5 %}
+
+    <div class="container custom-container">
+        <h4>Выставить машину на продажу</h4>
+        <h6>Заполните все поля</h6>
+        <div class="row justify-content-start">
+            <div class="col-md-auto">
+                <form method="post" enctype="multipart/form-data" action="{% url 'sell_cars' %}" class="mb-3">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    {% endbuttons %}
+                </form>
+                {% if result %}
+                    <div class="alert alert-success mt-3" role="alert">
+                        {{ result }} <br>
+                        {{ message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
