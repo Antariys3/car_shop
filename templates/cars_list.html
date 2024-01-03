@@ -1,59 +1,44 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Список машин{% endblock %}
 
+
 {% block content %}
     {% load bootstrap5 %}
+    {% include 'carousel.html' %}
+    <div class="sections mt-3">
+        <div class="container">
+            <h4 class="text-center">Выберете машины для заказа</h4>
 
-    <div class="container-fluid mt-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <h4>Выберите клиента и количество машин для заказа</h4>
-                <form method="post" enctype="multipart/form-data" class="mb-3">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="client" class="form-label">Выберите клиента:</label>
-                        <select name="client" id="client" class="form-select">
-                            {% for client in clients %}
-                                <option value="{{ client.id }}">{{ client.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="row row-cols-1 row-cols-md-3">
-                        {% for car in car_types %}
-                            <div class="col mb-3">
-                                <div class="card">
-                                    <img class="card-img-top" src="{{ car.car_type.image.url }}"
+            <div class="row">
+                {% for car in cars %}
+                    <div class="col-lg-4">
+
+                        <div class="car-item">
+
+                            <div>
+                                <a href="{% url "car_detail" car.id %}"> 
+                                    <img class="card-img-top-2" src="{{ car.car_type.image.url }}"
                                          alt="{{ car.car_type.name }}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ car.car_type.brand }} {{ car.car_type.name }}</h5>
-                                        <label for="quantity_{{ car.car_type.brand }}_{{ car.car_type.name }}_{{ car.car_type.image }}"
-                                               class="form-label">Выберите количество:</label>
-                                        <select name="quantity_{{ car.car_type.brand }}_{{ car.car_type.name }}_{{ car.car_type.image }}"
-                                                id="quantity_{{ car.car_type.brand }}_{{ car.car_type.name }}_{{ car.car_type.image }}"
-                                                class="form-select">
-                                            {% for i in car.count %}
-                                                <option value="{{ i }}">{{ i }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
+                                </a>
                             </div>
-                        {% endfor %}
+                            <h5> {{ car.car_type.brand }} {{ car.car_type.name }}</h5>
+                            <p class="mb-2">Год {{ car.year }}</p>
+                            <p class="mb-2">Цена: {{ car.car_type.price }}</p>
+                            {% if request.user.is_authenticated %}
+                                <div class="add-to-cart-btn">
+                                    <form method="post" action="{% url 'cars_list' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="car_id" value="{{ car.id }}">
+                                        <button type="submit" class="btn btn-dark text-white">Добавить в корзину</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Добавить в корзину</button>
-                </form>
+                {% endfor %}
             </div>
         </div>
     </div>
-
-    {% if not clients or not car_types %}
-        <div class="container mt-3">
-            <div class="row">
-                <div class="col">
-                    <h5>В БД нет клиентов или машин.</h5>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}

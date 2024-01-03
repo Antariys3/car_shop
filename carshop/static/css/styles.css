@@ -1,0 +1,96 @@
+html, body{
+    height: 100%;
+    max-height: 100%;
+    background-color: #edeef0;
+}
+a {
+    display: block;
+    margin-bottom: 10px;
+    text-decoration: none;
+}
+
+.custom-container {
+    max-width: 30%;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.base-table {
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.base-table, .base-table th, .base-table td {
+    border: 1px solid #ccc;
+}
+
+.base-table th, .base-table td {
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.base-table th {
+    background-color: #f2f2f2;
+}
+
+.base-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table-style-1 {
+    width: 60%;
+}
+
+.table-style-2 {
+    width: 40%;
+}
+
+.table-style-3 {
+    width: 25%;
+}
+
+.form-label {
+    display: inline-block;
+    min-width: 150px;
+    vertical-align: top;
+}
+
+.form-control-car {
+    width: 30%;
+}
+
+.form-error ul {
+    list-style: none;
+    padding: 0;
+    color: #CC0000;
+}
+
+img.img-article-left {
+    max-width: 300px;
+    height: auto;
+    float: left;
+    padding: 0 10px 10px 0;
+}
+
+.section-top{
+    margin-bottom: 10px
+}
+
+
+.car-item{
+    height: 465px;
+    background-color: white;
+    border: 1px solid lightgrey;
+    position: relative;
+    padding: 10px 0 10px 0;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.card-img-top-2{
+    width: 96%;
+    height: 300px;
+}
+

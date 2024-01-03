@@ -13,7 +13,7 @@
         </tr>
         {% for order in list_orders %}
             <tr>
-                <td><a href="{% url 'order_detail' order.id %}">{{ order.id }}</a></td>
+                <td><a href="{% url 'basket' %}">{{ order.id }}</a></td>
                 <td>{{ order.client }}</td>
                 <td><a href="{% url 'delete_order' order.id %}">Удалить заказ</a></td>
             </tr>

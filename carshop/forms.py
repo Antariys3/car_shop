@@ -26,15 +26,6 @@ class CreateCarsForm(ModelForm):
         ],
     )
 
-    quantity = forms.IntegerField(
-        label="Количество машин",
-        widget=forms.NumberInput(attrs={"class": "form-control"}),
-        validators=[
-            MinValueValidator(0, message="Количество машин должно быть положительным"),
-            MaxValueValidator(20, message="Максимум 20 машин"),
-        ],
-    )
-
     class Meta:
         model = CarType
         fields = ["brand", "name", "price", "image"]
