@@ -2,8 +2,11 @@ from io import BytesIO
 
 from PIL import Image
 from django.core.files.base import ContentFile
+from faker import Faker
 
 from carshop.models import Client
+
+fake = Faker("ru_RU")
 
 
 def create_clients(user):
@@ -16,9 +19,7 @@ def create_clients(user):
     else:
         client_name = user.username
     client = Client.objects.create(
-        name=client_name,
-        email=user.email,
-        phone=user.id
+        name=client_name, email=user.email, phone=fake.phone_number()
     )
     return client
 
@@ -35,6 +36,6 @@ def crop_image(image):
 
     img_cropped = img_cropped.convert("RGB")
     output_buffer = BytesIO()
-    img_cropped.save(output_buffer, format='JPEG')
+    img_cropped.save(output_buffer, format="JPEG")
 
     return ContentFile(output_buffer.getvalue())
