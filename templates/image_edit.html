@@ -4,6 +4,7 @@
 
 {% block content %}
     {% load bootstrap5 %}
+    <div class="container custom-container">
     <h1>Редактировать изображения автомобилей</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -18,4 +19,5 @@
             </div>
         {% endfor %}
     </form>
+    </div>
 {% endblock %}

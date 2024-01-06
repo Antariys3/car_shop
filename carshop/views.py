@@ -105,7 +105,7 @@ def delete_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.delete()
 
-    return redirect("orders_page")
+    return redirect("cars_list")
 
 
 def payment(request, order_id):
