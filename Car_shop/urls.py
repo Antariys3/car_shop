@@ -27,16 +27,16 @@ from carshop.views import (
     image_edit,
     CarsShopView,
     CarDetailView,
-    BasketView
-
+    BasketView,
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include("carshop.urls")),
     path("", index, name="home"),
     path("cars_list/", CarsShopView.as_view(), name="cars_list"),
-    path('car/<int:car_id>/', CarDetailView.as_view(), name='car_detail'),
-    path('basket/', BasketView.as_view(), name='basket'),
+    path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
+    path("basket/", BasketView.as_view(), name="basket"),
     path("orders_page/", orders_page, name="orders_page"),
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
     path("payment/<int:order_id>/", payment, name="payment"),

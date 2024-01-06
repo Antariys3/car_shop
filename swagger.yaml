@@ -1,0 +1,382 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Cars shop api page
+  description: API for describing a cars shop.
+  contact:
+    name: Andrii Tarasenko
+    email: 333antar333@gmail.com
+servers:
+  - url: https://boiling-fortress-51276-88bb58822abe.herokuapp.com/api/
+
+paths:
+  /api-token-auth/:
+    post:
+      summary: User authentication and token generation
+      tags:
+        - Authentication
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '201':
+          description: Token created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The authentication token.
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+        '401':
+          description: Invalid credentials
+
+  /cars/:
+    get:
+      summary: method for getting list of cars
+      tags:
+        - Cars
+      operationId: getAllCars
+      responses:
+        '200':
+          description: successful response with list of cars
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cars"
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+  /cars/{car_id}:
+    get:
+      summary: method for getting car by ID
+      tags:
+        - Cars
+      operationId: getCarById
+      parameters:
+        - name: car_id
+          in: path
+          required: true
+          description: id car
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful response with list of cars
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        '404':
+          description: Not Found
+  /add_to_cart/{car_id}/:
+    post:
+      summary: Add a car to the shopping cart
+      tags:
+        - Cart
+      parameters:
+        - name: car_id
+          in: path
+          description: ID of the car to add to the cart
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Car added to the cart successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        '404':
+          description: Car not found or cannot be added to the cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Car not found"
+  /cart/:
+    get:
+      summary: Retrieve user's cart details
+      tags:
+        - Cart
+      operationId: getCartDetails
+      responses:
+        '200':
+          description: Successful response with user's cart details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+        '404':
+          description: Cart is empty or not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Buying a car and issuing a registration number
+      tags:
+        - Cart
+      operationId: markCartAsPaid
+      responses:
+        '200':
+          description: Licenses generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Licences"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Empty the cart
+      tags:
+        - Cart
+      operationId: emptyCart
+      responses:
+        '200':
+          description: The cart was successfully emptied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  massage:
+                    type: string
+                    example: "The cart was successfully emptied"
+                required:
+                  - massage
+        '404':
+          description: Cart is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /cart/{pk}/:
+    delete:
+      summary: Remove a car from the cart
+      tags:
+        - Cart
+      operationId: removeCarFromCart
+      parameters:
+        - name: pk
+          in: path
+          required: true
+          description: The ID of the car to be removed
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: The car from the basket has been successfully removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  massage:
+                    type: string
+                    example: "The car from the basket has been successfully removed."
+                required:
+                  - massage
+        '404':
+          description: Car not found or cart is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - username
+        - password
+        - email
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "username"
+        password:
+          type: string
+          example: "password"
+        email:
+          type: string
+          example: "123username@gmail.com"
+    Car:
+      type: object
+      required:
+        - car_type
+        - color
+        - year
+        - blocked_by_order
+        - owner
+      properties:
+        id:
+          type: integer
+          example: 1
+        car_type:
+          $ref: "#/components/schemas/CarType"
+        color:
+          type: string
+          example: "black"
+        year:
+          type: string
+          example: "2020"
+        blocked_by_order:
+          type: integer
+          example: 1
+        owner:
+          type: integer
+          example: 1
+    Cars:
+      type: array
+      items:
+        $ref: "#/components/schemas/Car"
+    CarType:
+      type: object
+      required:
+        - name
+        - brand
+        - price
+        - image
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "A-6"
+        brand:
+          type: string
+          example: "AUDI"
+        price:
+          type: integer
+          example: 15000
+        image:
+          type: string
+          example: "/path/to/your/image.jpg"
+    Order:
+      type: object
+      required:
+        - client
+        - is_paid
+      properties:
+        id:
+          type: integer
+          example: 1
+        client:
+          type: string
+          example: "Jack"
+        is_paid:
+          type: boolean
+          example: False
+    OrderQuantity:
+      type: object
+      required:
+        - car_type
+        - quantity
+        - order
+      properties:
+        id:
+          type: integer
+          example: 1
+        car_type:
+          type: integer
+          example: 1
+        quantity:
+          type: integer
+          example: 1
+        order:
+          type: integer
+          example: 1
+    OrderQuantities:
+      type: array
+      items:
+        $ref: "#/components/schemas/OrderQuantity"
+    Licence:
+      type: object
+      required:
+        - car
+        - number
+        - order
+      properties:
+        id:
+          type: integer
+          example: 1
+        car:
+          type: integer
+          example: 1
+        number:
+          type: string
+          example: "AX 5456 ZD"
+        order:
+          type: integer
+          example: 1
+    Licences:
+      type: array
+      items:
+        $ref: "#/components/schemas/Licence"
+    Client:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Касьянов Михаил"
+        email:
+          type: string
+          example: "mihail.kasyanov@gmail.com"
+        phone:
+          type: string
+          example: "+48 123-45-67"
+    CartResponse:
+      type: object
+      properties:
+        cart:
+          type: object
+          properties:
+            order:
+              $ref: "#/components/schemas/Order"
+            cars:
+              type: array
+              items:
+                $ref: "#/components/schemas/Car"
+            total_price:
+              type: integer
+          required:
+            - order
+            - cars
+            - total_price
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

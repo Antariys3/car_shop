@@ -15,6 +15,7 @@ Django==4.2.6
 django-allauth==0.58.2
 django-bootstrap-v5==1.0.11
 django-storages==1.14.2
+djangorestframework==3.14.0
 Faker==19.12.0
 gunicorn==21.2.0
 idna==3.4
@@ -25,9 +26,6 @@ packaging==23.2
 pathspec==0.11.2
 Pillow==10.1.0
 platformdirs==3.11.0
-psycopg==3.1.12
-psycopg-c==3.1.12
-psycopg2-binary==2.9.9
 pycparser==2.21
 PyJWT==2.8.0
 python-dateutil==2.8.2
@@ -49,5 +47,6 @@ whitenoise==6.6.0
 # On other platforms/in development, the precompiled binary package is used instead, to
 # speed up installation and avoid errors from missing libraries/headers.
 
+psycopg2-binary==2.9.9
 #psycopg[c]; sys_platform == "linux"
 #psycopg[binary]; sys_platform != "linux"
