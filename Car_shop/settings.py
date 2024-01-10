@@ -264,3 +264,5 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ]
 }
+
+MONOBANK_TOKEN = os.getenv("MONOBANK_TOKEN")
