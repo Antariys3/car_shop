@@ -2,7 +2,7 @@
 *.log
 *.pot
 *.pyc
-__pycache__
+
 db.sqlite3
 media
 
@@ -139,9 +139,8 @@ GitHub.sublime-settings
 
 # Byte-compiled / optimized / DLL files
 templates/test.html
-carshop/__pycache__/
-Car_shop/__pycache__/
-__pycache__/
+
+
 *$py.class
 
 .idea/
