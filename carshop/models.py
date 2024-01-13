@@ -91,16 +91,35 @@ class Dealership(models.Model):
 class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="orders")
     is_paid = models.BooleanField(default=False)
+    invoice_url = models.CharField(max_length=100, null=True)
+    status = models.CharField(max_length=100, null=True)
+    invoice_id = models.CharField(max_length=100, null=True)
 
 
 class OrderQuantity(models.Model):
     car_type = models.ForeignKey(
-        CarType, on_delete=models.CASCADE, related_name="order_quantities"
+        CarType, on_delete=models.CASCADE, related_name="car_types"
     )
     quantity = models.PositiveIntegerField(default=1)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="car_types")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_quantities")
 
 
 class CarPhotos(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to="images", blank=True)
+
+
+class MonoSettings(models.Model):
+    public_key = models.CharField(max_length=250, unique=True)
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def create_new(cls, get_monobank_public_key_callback):
+        return cls.objects.create(public_key=get_monobank_public_key_callback())
+
+    @classmethod
+    def get_latest_or_add(cls, get_monobank_public_key_callback):
+        latest = cls.objects.order_by("-received_at").first()
+        if not latest:
+            latest = cls.create_new(get_monobank_public_key_callback)
+        return latest

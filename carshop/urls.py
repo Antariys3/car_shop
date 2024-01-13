@@ -7,6 +7,7 @@ from carshop.api import (
     CustomObtainAuthToken,
     AddToCartAPIView,
     CartAPIView,
+    MonoAcquiringWebhookReceiver,
 )
 
 router = routers.DefaultRouter()
@@ -18,4 +19,5 @@ urlpatterns += [
     path("add_to_cart/<int:car_id>/", AddToCartAPIView.as_view(), name="add_to_cart"),
     path("cart/", CartAPIView.as_view(), name="cart"),
     path("cart/<int:pk>/", CartAPIView.as_view(), name="cart-detail"),
+    path("webhook-mono/", MonoAcquiringWebhookReceiver.as_view(), name="webhook-mono"),
 ]

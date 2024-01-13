@@ -6,16 +6,15 @@ from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from carshop.car_utils import create_clients
+from carshop.invoices import create_invoice, verify_signature
 from carshop.serializers import (
     CarSerializer,
-    ClientSerializer,
     OrderSerializer,
-    LicenceSerializer,
 )
-from .faker import fake
 from .models import Order, OrderQuantity, Car, Client
 
 
@@ -115,22 +114,13 @@ class CartAPIView(APIView):
             client_id=client,
             is_paid=False,
         )
-        order.is_paid = True
-        order.save()
 
-        cars = Car.objects.filter(blocked_by_order=order, owner=client)
-        licences_data = [
-            {"car": car.id, "number": fake.car_number(), "order": order.id}
-            for car in cars
-        ]
-        licences_serializer = LicenceSerializer(data=licences_data, many=True)
-        if licences_serializer.is_valid():
-            licences_serializer.save()
-            return Response(licences_serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(
-                licences_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related('car_type')
+
+        # create_invoice(order, cars, "https://webhook.site/209833c7-0212-4e72-aedc-742aaf0453ae")
+        create_invoice(order, cars, reverse("webhook-mono", request=request))
+
+        return Response({"invoice_url": order.invoice_url})
 
     def delete(self, request, *args, **kwargs):
         # a method that removes a cart or one car
@@ -167,3 +157,23 @@ class CartAPIView(APIView):
             {"massage": "The car from the basket has been successfully removed."},
             status=status.HTTP_200_OK,
         )
+
+
+class MonoAcquiringWebhookReceiver(APIView):
+
+    def post(self, request):
+        try:
+            verify_signature(request)
+        except Exception as e:
+            return Response({"status": "error"}, status=400)
+        reference = request.data.get("reference")
+        order = Order.objects.get(id=reference)
+        if order.invoice_id != request.data.get("invoiceId"):
+            return Response({"status": "error"}, status=400)
+        order.status = request.data.get("status", "error")
+        order.save()
+        if order.status == "success":
+            order.is_paid = True
+            order.save()
+            return Response({"status": "Paid"}, status=200)
+        return Response({"status": "ok"})
