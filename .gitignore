@@ -151,3 +151,5 @@ venv_l/
 venv_p
 /venv_l/
 /templates/registration/test.html
+/Старые версии/cars_list.html
+/Старые версии/вьюхи.py

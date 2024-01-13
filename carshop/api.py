@@ -24,15 +24,26 @@ class CustomObtainAuthToken(ObtainAuthToken):
         password = request.data.get("password")
         email = request.data.get("email")
 
-        # create a new user or update the token
-        user, created = User.objects.get_or_create(
-            username=username, defaults={"email": email}
-        )
+        # Try to get the user
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = None
 
-        if user.check_password(password):
+        if user and user.check_password(password):
+            # User exists, check password
             token, created = Token.objects.get_or_create(user=user)
             return Response({"token": token.key})
+        elif not user:
+            # User does not exist, create a new one
+            user = User.objects.create(username=username, email=email)
+            user.set_password(password)
+            user.save()
+
+            token = Token.objects.create(user=user)
+            return Response({"token": token.key})
         else:
+            # User exists, but password is incorrect
             return Response(
                 {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
