@@ -17,6 +17,7 @@ django-bootstrap-v5==1.0.11
 django-storages==1.14.2
 djangorestframework==3.14.0
 ecdsa==0.18.0
+exceptiongroup==1.2.0
 Faker==19.12.0
 gunicorn==21.2.0
 idna==3.4
@@ -29,8 +30,10 @@ Pillow==10.1.0
 platformdirs==3.11.0
 pycparser==2.21
 PyJWT==2.8.0
+pytest==7.4.4
 python-dateutil==2.8.2
 python3-openid==3.2.0
+pytest-django==4.7.0
 requests==2.31.0
 requests-oauthlib==1.3.1
 s3transfer==0.8.2
@@ -49,5 +52,5 @@ whitenoise==6.6.0
 # speed up installation and avoid errors from missing libraries/headers.
 
 psycopg2-binary==2.9.9
-psycopg[c]; sys_platform == "linux"
-psycopg[binary]; sys_platform != "linux"
+#psycopg[c]; sys_platform == "linux"
+#psycopg[binary]; sys_platform != "linux"
