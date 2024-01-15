@@ -8,6 +8,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from carshop.car_utils import create_clients
 from carshop.invoices import create_invoice, verify_signature
@@ -86,7 +87,7 @@ class AddToCartAPIView(APIView):
 
 
 class CartAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         # view cart with cars
@@ -177,3 +178,39 @@ class MonoAcquiringWebhookReceiver(APIView):
             order.save()
             return Response({"status": "Paid"}, status=200)
         return Response({"status": "ok"})
+
+
+class PaymentStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        owner = Client.objects.filter(email=request.user.email).first()
+
+        if not owner:
+            return Response(
+                {"error": "Client not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        order_number = request.query_params.get("order_number")
+
+        if not order_number:
+            return Response(
+                {"error": "Order number is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            order = Order.objects.get(id=order_number, client_id=owner)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": f"Order with number {order_number} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        status_data = {
+            "order_number": order.id,
+            "status": order.status
+        }
+
+        return Response(status_data, status=status.HTTP_200_OK)

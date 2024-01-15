@@ -8,6 +8,8 @@ from carshop.api import (
     AddToCartAPIView,
     CartAPIView,
     MonoAcquiringWebhookReceiver,
+    PaymentStatusView,
+    PaymentStatusView,
 )
 
 router = routers.DefaultRouter()
@@ -20,4 +22,5 @@ urlpatterns += [
     path("cart/", CartAPIView.as_view(), name="cart"),
     path("cart/<int:pk>/", CartAPIView.as_view(), name="cart-detail"),
     path("webhook-mono/", MonoAcquiringWebhookReceiver.as_view(), name="webhook-mono"),
+    path("payment-status/", PaymentStatusView.as_view(), name="payment-status"),
 ]

@@ -39,9 +39,14 @@ export GOOGLE_CLIENT_ID='foo'
 export GOOGLE_CLIENT_SECRET='foo'
 ```
 
-8. Run Django web server.
+8. Set environment variables (needed to pay for goods)
+```
+MONOBANK_TOKEN='foo'
+```
+
+9. Run Django web server.
 ```
 python manage.py runserver
 ```
 
-9. Add cars to the database. Go to the website page http://127.0.0.1:8000/create_cars/
+10. Add car to the database. Go to the website page http://127.0.0.1:8000/sell_cars/
