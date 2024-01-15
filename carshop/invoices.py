@@ -7,7 +7,7 @@ from django.conf import settings
 
 from carshop.models import Order, Car, MonoSettings
 
-public_key = MonoSettings.objects.get(id=1).public_key
+public_key = "uiI8Jcgsw8ClrDXZ_am9GIO30HYgwaeciXKSapfWVb24"
 
 def verify_signature(request):
 
