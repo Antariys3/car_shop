@@ -52,5 +52,5 @@ whitenoise==6.6.0
 # speed up installation and avoid errors from missing libraries/headers.
 
 psycopg2-binary==2.9.9
-#psycopg[c]; sys_platform == "linux"
-#psycopg[binary]; sys_platform != "linux"
+psycopg[c]; sys_platform == "linux"
+psycopg[binary]; sys_platform != "linux"
