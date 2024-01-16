@@ -10,9 +10,12 @@
     <div class="sections mt-3">
         <div class="container">
             <h4 class="text-center">Выберете машины для заказа</h4>
-
-            <div class="row">
+            {% for brand in bands %}
+                <section>
+                <p>Машини типу - {{ brand }}</p>
+                <div class="row">
                 {% for car in cars %}
+                    {%  if car.car_type.brand == brand %}
                     <div class="col-lg-4">
 
                         <div class="car-item">
@@ -37,8 +40,12 @@
                             {% endif %}
                         </div>
                     </div>
+                    {% endif %}
                 {% endfor %}
             </div>
+                </section>
+            {% endfor %}
+            
         </div>
     </div>
 {% endblock %}
