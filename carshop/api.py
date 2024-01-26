@@ -6,16 +6,16 @@ from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from carshop.car_utils import create_clients
+from carshop.invoices import create_invoice, verify_signature
 from carshop.serializers import (
     CarSerializer,
-    ClientSerializer,
     OrderSerializer,
-    LicenceSerializer,
 )
-from .faker import fake
 from .models import Order, OrderQuantity, Car, Client
 
 
@@ -25,15 +25,26 @@ class CustomObtainAuthToken(ObtainAuthToken):
         password = request.data.get("password")
         email = request.data.get("email")
 
-        # create a new user or update the token
-        user, created = User.objects.get_or_create(
-            username=username, defaults={"email": email}
-        )
+        # Try to get the user
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = None
 
-        if user.check_password(password):
+        if user and user.check_password(password):
+            # User exists, check password
             token, created = Token.objects.get_or_create(user=user)
             return Response({"token": token.key})
+        elif not user:
+            # User does not exist, create a new one
+            user = User.objects.create(username=username, email=email)
+            user.set_password(password)
+            user.save()
+
+            token = Token.objects.create(user=user)
+            return Response({"token": token.key})
         else:
+            # User exists, but password is incorrect
             return Response(
                 {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
@@ -76,7 +87,7 @@ class AddToCartAPIView(APIView):
 
 
 class CartAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         # view cart with cars
@@ -104,22 +115,13 @@ class CartAPIView(APIView):
             client_id=client,
             is_paid=False,
         )
-        order.is_paid = True
-        order.save()
 
-        cars = Car.objects.filter(blocked_by_order=order, owner=client)
-        licences_data = [
-            {"car": car.id, "number": fake.car_number(), "order": order.id}
-            for car in cars
-        ]
-        licences_serializer = LicenceSerializer(data=licences_data, many=True)
-        if licences_serializer.is_valid():
-            licences_serializer.save()
-            return Response(licences_serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(
-                licences_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related('car_type')
+
+        # create_invoice(order, cars, "https://webhook.site/209833c7-0212-4e72-aedc-742aaf0453ae")
+        create_invoice(order, cars, reverse("webhook-mono", request=request))
+
+        return Response({"invoice_url": order.invoice_url})
 
     def delete(self, request, *args, **kwargs):
         # a method that removes a cart or one car
@@ -156,3 +158,59 @@ class CartAPIView(APIView):
             {"massage": "The car from the basket has been successfully removed."},
             status=status.HTTP_200_OK,
         )
+
+
+class MonoAcquiringWebhookReceiver(APIView):
+
+    def post(self, request):
+        try:
+            verify_signature(request)
+        except Exception as e:
+            return Response({"status": "error"}, status=400)
+        reference = request.data.get("reference")
+        order = Order.objects.get(id=reference)
+        if order.invoice_id != request.data.get("invoiceId"):
+            return Response({"status": "error"}, status=400)
+        order.status = request.data.get("status", "error")
+        order.save()
+        if order.status == "success":
+            order.is_paid = True
+            order.save()
+            return Response({"status": "Paid"}, status=200)
+        return Response({"status": "ok"})
+
+
+class PaymentStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        owner = Client.objects.filter(email=request.user.email).first()
+
+        if not owner:
+            return Response(
+                {"error": "Client not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        order_number = request.query_params.get("order_number")
+
+        if not order_number:
+            return Response(
+                {"error": "Order number is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            order = Order.objects.get(id=order_number, client_id=owner)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": f"Order with number {order_number} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        status_data = {
+            "order_number": order.id,
+            "status": order.status
+        }
+
+        return Response(status_data, status=status.HTTP_200_OK)

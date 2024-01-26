@@ -27,27 +27,36 @@ class CarsShopView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['cars'] = Car.objects.filter(blocked_by_order=None, owner=None).select_related("car_type")
+        context["cars"] = Car.objects.filter(
+            blocked_by_order=None, owner=None
+        ).select_related("car_type")
+        context["brands"] =  [car.car_type.brand for car in context["cars"]]
         return context
 
     def post(self, request, *args, **kwargs):
         client = create_clients(request.user)
-        car_id = request.POST.get('car_id')
+        car_id = request.POST.get("car_id")
         car = Car.objects.select_related("car_type").get(id=car_id)
 
         order = Order.objects.filter(client_id=client.id, is_paid=False).first()
         if order:
-            OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
+            OrderQuantity.objects.create(
+                car_type=car.car_type, quantity=1, order=order
+            )
 
         else:
             order = Order.objects.create(client=client)
-            OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
+            OrderQuantity.objects.create(
+                car_type=car.car_type, quantity=1, order=order
+            )
 
         car.block(order)
         car.add_owner(client)
 
-        cars = Car.objects.filter(blocked_by_order=None, owner=None).select_related("car_type")
-        return render(request, "cars_list.html", {'cars': cars})
+        cars = Car.objects.filter(
+            blocked_by_order=None, owner=None
+        ).select_related("car_type")
+        return render(request, "cars_list.html", {"cars": cars})
 
 
 class CarDetailView(DetailView):
@@ -55,14 +64,14 @@ class CarDetailView(DetailView):
     template_name = "car_detail.html"
 
     def get(self, request, *args, **kwargs):
-        car_id = self.kwargs.get('car_id')
-        car = Car.objects.filter(id=car_id).prefetch_related('car_type').first()
+        car_id = self.kwargs.get("car_id")
+        car = Car.objects.filter(id=car_id).prefetch_related("car_type").first()
         if car is None:
             raise Http404("Car does not exist")
-        return render(request, self.template_name, {'car': car})
+        return render(request, self.template_name, {"car": car})
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class BasketView(View):
     template_name = "basket.html"
 
@@ -70,25 +79,29 @@ class BasketView(View):
         owner = Client.objects.filter(email=request.user.email).first()
         order = Order.objects.filter(is_paid=False, client_id=owner).first()
         if order is None:
-            return render(request, self.template_name, {'order': order})
-        cars = Car.objects.filter(blocked_by_order=order).select_related("car_type")
+            return render(request, self.template_name, {"order": order})
+        cars = Car.objects.filter(blocked_by_order=order).select_related(
+            "car_type"
+        )
         total_price = sum(car.car_type.price for car in cars)
         context = {
-            'order': order,
-            'cars': cars,
-            'total_price': total_price,
+            "order": order,
+            "cars": cars,
+            "total_price": total_price,
         }
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        order_id = request.POST.get('order_id')
+        order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
         order.is_paid = True
         order.save()
 
         cars = Car.objects.filter(blocked_by_order=order.id)
         for car in cars:
-            Licence.objects.create(car=car, number=fake.car_number(), order_id=order.id)
+            Licence.objects.create(
+                car=car, number=fake.car_number(), order_id=order.id
+            )
         return redirect("payment", order.id)
 
 
@@ -110,7 +123,9 @@ def delete_order(request, order_id):
 
 def payment(request, order_id):
     licenses = Licence.objects.filter(order_id=order_id)
-    return render(request, "payment.html", {"licenses": licenses, "order_id": order_id})
+    return render(
+        request, "payment.html", {"licenses": licenses, "order_id": order_id}
+    )
 
 
 @login_required
@@ -129,7 +144,9 @@ def sell_cars(request):
 
         try:
             with transaction.atomic():
-                car_type = CarType.objects.create(brand=brand, name=name, price=price)
+                car_type = CarType.objects.create(
+                    brand=brand, name=name, price=price
+                )
                 car_type.image.save(f"{image}", crop_image(image))
                 car = Car(car_type=car_type, color=color, year=year)
                 car.save()

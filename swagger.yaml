@@ -12,7 +12,7 @@ servers:
 paths:
   /api-token-auth/:
     post:
-      summary: User authentication and token generation
+      summary: Authorization and token creation. Registered users only need to enter their login and password.
       tags:
         - Authentication
       operationId: createUser
@@ -125,17 +125,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      summary: Buying a car and issuing a registration number
+      summary: Creating a payment link
       tags:
         - Cart
       operationId: markCartAsPaid
       responses:
         '200':
-          description: Licenses generated successfully
+          description: payment link has been successfully created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Licences"
+                type: object
+                properties:
+                  invoice_url:
+                    type: string
+                    description: URL for the payment link
+                example:
+                  invoice_url: "https://pay.mbnk.biz/123456iDfJtqzNXqC"
         '400':
           description: Bad Request
           content:
@@ -168,7 +174,7 @@ paths:
                 $ref: "#/components/schemas/Error"
   /cart/{pk}/:
     delete:
-      summary: Remove a car from the cart
+      summary: Removing a car from the cart using pk. Pk is car_type id, not to be confused with car id.
       tags:
         - Cart
       operationId: removeCarFromCart
@@ -199,6 +205,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /payment-status/:
+    get:
+      summary: Retrieve Order Status
+      parameters:
+        - name: order_number
+          in: query
+          required: true
+          description: Order number
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                order_number: 31
+                status: success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                error: Invalid request parameters
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                error: Authentication required
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              example:
+                error: Order with specified number not found
 
 
 components:
