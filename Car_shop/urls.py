@@ -33,8 +33,8 @@ from carshop.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("carshop.urls")),
-    path("", index, name="home"),
-    path("cars_list/", CarsShopView.as_view(), name="cars_list"),
+    path("index/", index, name="home"),
+    path("", CarsShopView.as_view(), name="cars_list"),
     path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
     path("basket/", BasketView.as_view(), name="basket"),
     path("orders_page/", orders_page, name="orders_page"),

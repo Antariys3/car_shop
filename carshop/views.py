@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, View, TemplateView
+from django.views.generic import View, TemplateView
 
 from carshop.car_utils import create_clients, crop_image
 from .faker import fake
@@ -50,7 +50,7 @@ class CarsShopView(TemplateView):
         return render(request, "cars_list.html", {'cars': cars})
 
 
-class CarDetailView(DetailView):
+class CarDetailView(View):
     model = Car
     template_name = "car_detail.html"
 
@@ -59,7 +59,32 @@ class CarDetailView(DetailView):
         car = Car.objects.filter(id=car_id).prefetch_related('car_type').first()
         if car is None:
             raise Http404("Car does not exist")
-        return render(request, self.template_name, {'car': car})
+        cars_count = Car.objects.filter(color=car.color, year=car.year, blocked_by_order=None, owner=None,
+                                        car_type__name=car.car_type.name, car_type__brand=car.car_type.brand).count()
+        return render(request, self.template_name, {'car': car, "cars_count": cars_count})
+
+    @method_decorator(login_required, name='dispatch')
+    def post(self, request, *args, **kwargs):
+        client = create_clients(request.user)
+        if client is None:
+            return redirect("login")
+        car_id = self.kwargs.get('car_id')
+        quantity = int(request.POST.get('number'))
+        car = Car.objects.select_related("car_type").get(id=car_id)
+        cars = Car.objects.filter(blocked_by_order=None, owner=None, color=car.color, car_type__name=car.car_type.name,
+                                  car_type__brand=car.car_type.brand)[:quantity]
+        order = Order.objects.filter(client_id=client.id, is_paid=False).first()
+        for car in cars:
+            if order:
+                OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
+
+            else:
+                order = Order.objects.create(client=client)
+                OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
+
+            car.block(order)
+            car.add_owner(client)
+        return redirect("basket")
 
 
 @method_decorator(login_required, name='dispatch')
@@ -140,7 +165,9 @@ def sell_cars(request):
 
 
 def image_edit(request):
-    car_types = CarType.objects.values("brand", "name", "image").distinct()
+    cars = Car.objects.filter(blocked_by_order=None, owner=None).prefetch_related("car_type")
+    car_types = CarType.objects.filter(id__in=cars.values_list('car_type__id', flat=True)).values("brand", "name",
+                                                                                                  "image").distinct()
     for car in car_types:
         car["car_type"] = CarType.objects.filter(
             brand=car["brand"], name=car["name"], image=car["image"]
