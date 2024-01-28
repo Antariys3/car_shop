@@ -101,7 +101,9 @@ class OrderQuantity(models.Model):
         CarType, on_delete=models.CASCADE, related_name="car_types"
     )
     quantity = models.PositiveIntegerField(default=1)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_quantities")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="order_quantities"
+    )
 
 
 class CarPhotos(models.Model):

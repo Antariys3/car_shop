@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Client, CarType, Car, Dealership, Licence, Order, OrderQuantity, MonoSettings
+from .models import (
+    Client,
+    CarType,
+    Car,
+    Dealership,
+    Licence,
+    Order,
+    OrderQuantity,
+    MonoSettings,
+)
 
 admin.site.register(Client)
 admin.site.register(CarType)

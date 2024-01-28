@@ -116,7 +116,9 @@ class CartAPIView(APIView):
             is_paid=False,
         )
 
-        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related('car_type')
+        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related(
+            "car_type"
+        )
 
         # create_invoice(order, cars, "https://webhook.site/209833c7-0212-4e72-aedc-742aaf0453ae")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
@@ -161,7 +163,6 @@ class CartAPIView(APIView):
 
 
 class MonoAcquiringWebhookReceiver(APIView):
-
     def post(self, request):
         try:
             verify_signature(request)
@@ -208,9 +209,6 @@ class PaymentStatusView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        status_data = {
-            "order_number": order.id,
-            "status": order.status
-        }
+        status_data = {"order_number": order.id, "status": order.status}
 
         return Response(status_data, status=status.HTTP_200_OK)

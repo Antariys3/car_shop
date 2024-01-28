@@ -58,7 +58,7 @@ class TestCarsApi(APITransactionTestCase):
                     "name": "A-6",
                     "brand": "AUDI",
                     "price": 12000,
-                    "image": 'http://testserver/carshop/static/media/audi_rs-6.jpg',
+                    "image": "http://testserver/carshop/static/media/audi_rs-6.jpg",
                 },
                 "color": "белый",
                 "year": 2012,
@@ -70,7 +70,7 @@ class TestCarsApi(APITransactionTestCase):
                     "name": "Passat",
                     "brand": "Volkswagen",
                     "price": 10000,
-                    "image": 'http://testserver/carshop/static/media/audi_rs-6.jpg',
+                    "image": "http://testserver/carshop/static/media/audi_rs-6.jpg",
                 },
                 "color": "black",
                 "year": 2010,
@@ -94,7 +94,7 @@ class TestBasketApi(APITransactionTestCase):
                 "name": "Passat",
                 "brand": "Volkswagen",
                 "price": 10000,
-                "image": '/carshop/static/media/audi_rs-6.jpg',
+                "image": "/carshop/static/media/audi_rs-6.jpg",
             },
             "color": "black",
             "year": 2010,
@@ -131,7 +131,7 @@ class TestBasketApi(APITransactionTestCase):
                             "name": "Passat",
                             "brand": "Volkswagen",
                             "price": 10000,
-                            "image": '/carshop/static/media/audi_rs-6.jpg',
+                            "image": "/carshop/static/media/audi_rs-6.jpg",
                         },
                         "color": "black",
                         "year": 2010,
@@ -143,11 +143,20 @@ class TestBasketApi(APITransactionTestCase):
 
     @responses.activate
     def test_creating_a_payment_link(self):
-        user = User.objects.create_user(username="testuser", password="testpassword", email="antar33@gmail.com")
+        user = User.objects.create_user(
+            username="testuser", password="testpassword", email="antar33@gmail.com"
+        )
         self.client.force_authenticate(user)
         body = {}
-        responses.add(responses.POST, "https://api.monobank.ua/api/merchant/invoice/create",
-                      json={"invoiceId": 25, "pageUrl": "https://pay.mbnk.biz/123456iDfJtqzNXqC"})
-        response = self.client.post("/api/cart/", json.dumps(body), content_type="application/json")
+        responses.add(
+            responses.POST,
+            "https://api.monobank.ua/api/merchant/invoice/create",
+            json={"invoiceId": 25, "pageUrl": "https://pay.mbnk.biz/123456iDfJtqzNXqC"},
+        )
+        response = self.client.post(
+            "/api/cart/", json.dumps(body), content_type="application/json"
+        )
         assert response.status_code == 200
-        assert response.json() == {"invoice_url": "https://pay.mbnk.biz/123456iDfJtqzNXqC"}
+        assert response.json() == {
+            "invoice_url": "https://pay.mbnk.biz/123456iDfJtqzNXqC"
+        }
