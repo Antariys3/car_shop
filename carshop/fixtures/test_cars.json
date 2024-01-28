@@ -1,0 +1,90 @@
+[
+  {
+    "model": "carshop.CarType",
+    "pk": 1,
+    "fields": {
+      "id": 1,
+      "name": "Passat",
+      "brand": "Volkswagen",
+      "price": 10000,
+      "image": "carshop/static/media/audi_rs-6.jpg"
+    }
+  },
+  {
+    "model": "carshop.CarType",
+    "pk": 2,
+    "fields": {
+      "id": 2,
+      "name": "A-6",
+      "brand": "AUDI",
+      "price": 12000,
+      "image": "carshop/static/media/audi_rs-6.jpg"
+    }
+  },
+  {
+    "model": "carshop.CarType",
+    "pk": 3,
+    "fields": {
+      "id": 3,
+      "name": "Passat",
+      "brand": "Volkswagen",
+      "price": 10000,
+      "image": "carshop/static/media/audi_rs-6.jpg"
+    }
+  },
+  {
+    "model": "carshop.Car",
+    "pk": 1,
+    "fields": {
+      "id": 1,
+      "car_type": 1,
+      "color": "black",
+      "year": 2010,
+      "blocked_by_order": null,
+      "owner": null
+    }
+  },
+  {
+    "model": "carshop.Car",
+    "pk": 2,
+    "fields": {
+      "id": 2,
+      "car_type": 2,
+      "color": "белый",
+      "year": 2012,
+      "blocked_by_order": null,
+      "owner": null
+    }
+  },
+  {
+    "model": "carshop.Car",
+    "pk": 3,
+    "fields": {
+      "id": 3,
+      "car_type": 3,
+      "color": "black",
+      "year": 2010,
+      "blocked_by_order": 1,
+      "owner": 1
+    }
+  },
+  {
+    "model": "carshop.Client",
+    "pk": 1,
+    "fields": {
+      "id": 1,
+      "name": "Andre Tarasenko",
+      "email": "antar33@gmail.com",
+      "phone": "+48795468444"
+    }
+  },
+  {
+    "model": "carshop.Order",
+    "pk": 1,
+    "fields": {
+      "id": 1,
+      "client": 1,
+      "is_paid": false
+    }
+  }
+]

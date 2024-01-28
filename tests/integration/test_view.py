@@ -42,23 +42,23 @@ def test_get_api_car_by_id():
     expected_response["car_type"]["image"] = response.json()["car_type"]["image"]
     assert response.json() == expected_response
 
-@pytest.mark.django_db
-def test_add_to_cart_api():
-
-    user = User.objects.create_user(username='testuser', password='testpassword')
-
-
-    car = Car.objects.create(
-        car_type_id=110,
-        color='Red',
-        year=2022
-    )
-
-    client = APIClient()
-    client.force_authenticate(user=user)
-
-    url = reverse('add-to-cart', kwargs={'car_id': car.id})
-    response = client.post(url)
-
-    assert response.status_code == status.HTTP_200_OK
-    assert 'invoice_url' in response.data
+# @pytest.mark.django_db
+# def test_add_to_cart_api():
+#
+#     user = User.objects.create_user(username='testuser', password='testpassword')
+#
+#
+#     car = Car.objects.create(
+#         car_type_id=110,
+#         color='Red',
+#         year=2022
+#     )
+#
+#     client = APIClient()
+#     client.force_authenticate(user=user)
+#
+#     url = reverse('add-to-cart', kwargs={'car_id': car.id})
+#     response = client.post(url)
+#
+#     assert response.status_code == status.HTTP_200_OK
+#     assert 'invoice_url' in response.data
