@@ -21,13 +21,15 @@ from carshop.views import (
     index,
     orders_page,
     delete_order,
-    payment,
+    issuance_of_a_license,
     sell_cars,
     logout_view,
     image_edit,
     CarsShopView,
     CarDetailView,
     BasketView,
+    MonoAcquiringWebhookReceiver,
+    PaymentStatusView
 )
 
 urlpatterns = [
@@ -39,9 +41,11 @@ urlpatterns = [
     path("basket/", BasketView.as_view(), name="basket"),
     path("orders_page/", orders_page, name="orders_page"),
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
-    path("payment/<int:order_id>/", payment, name="payment"),
+    path("issuance_of_a_license/<int:order_id>/", issuance_of_a_license, name="issuance_of_a_license"),
     path("sell_cars/", sell_cars, name="sell_cars"),
     path("logout", logout_view, name="logout"),
     path("accounts/", include("allauth.urls"), name="google_login"),
     path("image_edit/", image_edit, name="image_edit"),
+    path("webhook-mono/", MonoAcquiringWebhookReceiver.as_view(), name="webhook-mono"),
+    path("payment_status/", PaymentStatusView.as_view(), name="payment_status")
 ]

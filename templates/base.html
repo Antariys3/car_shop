@@ -35,6 +35,7 @@
                             {% else %}
                                 {{ user.username }} &nbsp; &nbsp;
                             {% endif %}
+                    <a href="{% url 'payment_status' %}" class="btn btn-success">Мои покупки</a>
                     <a href="{% url 'basket' %}" class="btn btn-success">Корзина</a>
                     <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
                 {% else %}

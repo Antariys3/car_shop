@@ -13,6 +13,7 @@ public_key = "uiI8Jcgsw8ClrDXZ_am9GIO30HYgwaeciXKSapfWVb24"
 def verify_signature(request):
     x_sing_base64 = request.headers["X-Sign"]
     body_test = request.body
+    print(body_test)
     public_key_bytes = base64.b64decode(public_key)
     signature_bytes = base64.b64decode(x_sing_base64)
     pub_key = ecdsa.VerifyingKey.from_pem(public_key_bytes.decode())
@@ -49,6 +50,7 @@ def create_invoice(order: Order, cars, webhook_url):
         "basketOrder": basket_order,
     }
     request_body = {
+        # "redirectUrl": "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/",
         "webHookUrl": webhook_url,
         "amount": amount,
         "merchantPaymInfo": merchants_info,

@@ -1,14 +1,22 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, resolve_url
+from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import View, TemplateView
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
+
 
 from carshop.car_utils import create_clients, crop_image
-from .faker import fake
+from carshop.invoices import create_invoice, verify_signature
 from .forms import CreateCarsForm
-from .models import Order, CarType, OrderQuantity, Car, Licence, Client
+from .models import CarType, OrderQuantity, Car, Licence, Client
+from .models import Order
 
 
 def logout_view(request):
@@ -127,15 +135,62 @@ class BasketView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        client = Client.objects.filter(email=request.user.email).first()
         order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
-        order.is_paid = True
+        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related(
+            "car_type"
+        )
+        # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
+        webhook_url = resolve_url("webhook-mono")
+
+        create_invoice(order, cars, webhook_url)
+        print(order.invoice_url)
+        return redirect(order.invoice_url)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(require_POST, name='post')
+class MonoAcquiringWebhookReceiver(View):
+
+    def post(self, request):
+        try:
+            verify_signature(request)
+        except Exception as e:
+            return JsonResponse({"status": "error"}, status=400)
+
+        reference = request.POST.get("reference")
+        order = get_object_or_404(Order, id=reference)
+
+        if order.invoice_id != request.POST.get("invoiceId"):
+            return JsonResponse({"status": "error"}, status=400)
+
+        order.status = request.POST.get("status", "error")
         order.save()
 
-        cars = Car.objects.filter(blocked_by_order=order.id)
-        for car in cars:
-            Licence.objects.create(car=car, number=fake.car_number(), order_id=order.id)
-        return redirect("payment", order.id)
+        if order.status == "success":
+            order.is_paid = True
+            order.save()
+            return JsonResponse({"status": "Paid"}, status=200)
+
+        return JsonResponse({"status": "ok"})
+
+
+@method_decorator(login_required, name="dispatch")
+class PaymentStatusView(TemplateView):
+    model = Order
+    template_name = "payment_state.html"
+
+    def get(self, request, *args, **kwargs):
+        owner = Client.objects.filter(email=request.user.email).first()
+        print(owner)
+        if not owner:
+            return render(request, self.template_name, {"order": owner})
+        order = Order.objects.filter(client_id=owner)
+        print(order)
+        if not order:
+            return render(request, self.template_name, {"order": order})
+        return render(request, self.template_name, {"order": order})
 
 
 def orders_page(request):
@@ -154,9 +209,9 @@ def delete_order(request, order_id):
     return redirect("cars_list")
 
 
-def payment(request, order_id):
+def issuance_of_a_license(request, order_id):
     licenses = Licence.objects.filter(order_id=order_id)
-    return render(request, "payment.html", {"licenses": licenses, "order_id": order_id})
+    return render(request, "issuance_of_a_license.html", {"licenses": licenses, "order_id": order_id})
 
 
 @login_required

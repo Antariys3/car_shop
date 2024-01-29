@@ -120,7 +120,7 @@ class CartAPIView(APIView):
             "car_type"
         )
 
-        # create_invoice(order, cars, "https://webhook.site/209833c7-0212-4e72-aedc-742aaf0453ae")
+        # create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
 
         return Response({"invoice_url": order.invoice_url})
@@ -181,7 +181,7 @@ class MonoAcquiringWebhookReceiver(APIView):
         return Response({"status": "ok"})
 
 
-class PaymentStatusView(APIView):
+class PaymentStatusApi(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
