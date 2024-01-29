@@ -1,7 +1,7 @@
 html, body{
-    max-height: 100%;
     background-color: #edeef0;
 }
+
 a {
     display: block;
     margin-bottom: 10px;
@@ -93,3 +93,6 @@ img.img-article-left {
     height: 300px;
 }
 
+.alert{
+    margin_bottom: 0px;
+}
