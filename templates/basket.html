@@ -47,7 +47,9 @@
             </div>
 
         {% else %}
-            <p>В вашей корзине нет заказов</p>
+            <div class="alert alert-info" role="alert">
+                В вашей корзине нет заказов
+            </div>
         {% endif %}
     </div>
 {% endblock %}

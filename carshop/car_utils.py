@@ -27,7 +27,7 @@ def create_clients(user):
 def crop_image(image):
     # function that crops the image to an aspect ratio of 4:3
     img = Image.open(image)
-    aspect_ratio = 4 / 3
+    aspect_ratio = 16 / 9
     width, height = img.size
     new_width = int(height * aspect_ratio)
     left_margin = int((width - new_width) / 2)

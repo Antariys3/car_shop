@@ -79,7 +79,7 @@ img.img-article-left {
 
 
 .car-item{
-    height: 465px;
+    height: 415px;
     background-color: white;
     border: 1px solid lightgrey;
     position: relative;
@@ -90,7 +90,7 @@ img.img-article-left {
 
 .card-img-top-2{
     width: 96%;
-    height: 300px;
+    height: 250px;
 }
 
 .alert{

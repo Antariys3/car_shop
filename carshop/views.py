@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework.reverse import reverse
+from django.http import Http404
 
 
 from carshop.car_utils import create_clients, crop_image
@@ -40,6 +41,7 @@ class CarsShopView(TemplateView):
         ).select_related("car_type")
         return context
 
+    @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
         client = create_clients(request.user)
         car_id = request.POST.get("car_id")
@@ -65,12 +67,13 @@ class CarsShopView(TemplateView):
 class CarDetailView(View):
     model = Car
     template_name = "car_detail.html"
+    not_found_template_name = "car_not_found.html"
 
     def get(self, request, *args, **kwargs):
         car_id = self.kwargs.get("car_id")
         car = Car.objects.filter(id=car_id).prefetch_related("car_type").first()
         if car is None:
-            raise Http404("Car does not exist")
+            return render(request, self.not_found_template_name)
         cars_count = Car.objects.filter(
             color=car.color,
             year=car.year,
