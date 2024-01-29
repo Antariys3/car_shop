@@ -17,21 +17,31 @@
                 <p class="mb-2">Цвет {{ car.color }}</p>
                 <p class="mb-2">Год {{ car.year }}</p>
                 <p class="mb-2">Цена: {{ car.car_type.price }}</p>
+                <p class="mb-2">Количество машин на складе: {{ cars_count }}</p>
 
-                <form id="form_buying_product" action="{% url 'home' %}" class="mb-3">
+                <form id="form_buying_product" action="{% url 'car_detail' car.id  %}" class="mb-3" method="post">
                     {% csrf_token %}
                     <div class="form-group" style="display: flex; align-items: center;">
-                        <input type="number" class="form-control" name="number" id="number" style="margin-right: 10px; width: 30%;">
-                        <button type="submit" id="submit_btn" class="btn btn-success btn-buy"
-                                data-car_id="{{ car.id }}"
-                                data-name="{{ car.car_type.name }}"
-                                data-price="{{ car.car_type.price }}"
-                        >
+                        <input type="number" class="form-control" name="number" id="number" style="margin-right: 10px; width: 30%;" min="1" max="{{ cars_count }}">
+                        <button type="submit" id="submit_btn" class="btn btn-success btn-buy" data-car_id="{{ car.id }}" data-name="{{ car.car_type.name }}" data-price="{{ car.car_type.price }}">
                             Купить
                         </button>
                     </div>
                 </form>
+
+                <script>
+                    document.getElementById('form_buying_product').addEventListener('submit', function (event) {
+                        var numberInput = document.getElementById('number');
+                        var carsCount = {{ cars_count }};
+
+                        if (numberInput.value < 1 || numberInput.value > carsCount) {
+                            alert('Пожалуйста, введите правильное количество машин.');
+                            event.preventDefault();
+                        }
+                    });
+                </script>
             </div>
         </div>
     </div>
 {% endblock %}
+

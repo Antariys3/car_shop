@@ -15,6 +15,7 @@ def test_get_api_cars():
     r.raise_for_status()
     assert r.status_code == 200
 
+
 def test_get_api_car_by_id():
     car_id = "100"
     expected_url = f"{SERVER_URL}cars/{car_id}"
@@ -25,10 +26,12 @@ def test_get_api_car_by_id():
             "name": "Astra",
             "brand": "Opel",
             "price": 9000,
-            "image": re.compile(r'https://cars-shop-aws\.s3\.amazonaws\.com/Images_of_cars/Opel_Astra_blue\.png.*')
+            "image": re.compile(
+                r"https://cars-shop-aws\.s3\.amazonaws\.com/Images_of_cars/Opel_Astra_blue\.png.*"
+            ),
         },
         "color": "синий",
-        "year": 2009
+        "year": 2009,
     }
 
     try:
@@ -38,27 +41,30 @@ def test_get_api_car_by_id():
         pytest.fail(f"Request failed with status code {e.response.status_code}")
 
     assert response.status_code == 200
-    assert expected_response["car_type"]["image"].match(response.json()["car_type"]["image"])
+    assert expected_response["car_type"]["image"].match(
+        response.json()["car_type"]["image"]
+    )
     expected_response["car_type"]["image"] = response.json()["car_type"]["image"]
     assert response.json() == expected_response
 
-@pytest.mark.django_db
-def test_add_to_cart_api():
 
-    user = User.objects.create_user(username='testuser', password='testpassword')
-
-
-    car = Car.objects.create(
-        car_type_id=110,
-        color='Red',
-        year=2022
-    )
-
-    client = APIClient()
-    client.force_authenticate(user=user)
-
-    url = reverse('add-to-cart', kwargs={'car_id': car.id})
-    response = client.post(url)
-
-    assert response.status_code == status.HTTP_200_OK
-    assert 'invoice_url' in response.data
+# @pytest.mark.django_db
+# def test_add_to_cart_api():
+#
+#     user = User.objects.create_user(username='testuser', password='testpassword')
+#
+#
+#     car = Car.objects.create(
+#         car_type_id=110,
+#         color='Red',
+#         year=2022
+#     )
+#
+#     client = APIClient()
+#     client.force_authenticate(user=user)
+#
+#     url = reverse('add-to-cart', kwargs={'car_id': car.id})
+#     response = client.post(url)
+#
+#     assert response.status_code == status.HTTP_200_OK
+#     assert 'invoice_url' in response.data

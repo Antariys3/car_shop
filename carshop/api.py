@@ -63,7 +63,7 @@ class AddToCartAPIView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request, car_id, *args, **kwargs):
-        # adding a car to cart
+        # adding a car to basket
         client = create_clients(request.user)
         order, created = Order.objects.get_or_create(client=client, is_paid=False)
         order_serializer = OrderSerializer(data=client)
@@ -116,9 +116,11 @@ class CartAPIView(APIView):
             is_paid=False,
         )
 
-        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related('car_type')
+        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related(
+            "car_type"
+        )
 
-        # create_invoice(order, cars, "https://webhook.site/209833c7-0212-4e72-aedc-742aaf0453ae")
+        # create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
 
         return Response({"invoice_url": order.invoice_url})
@@ -161,7 +163,6 @@ class CartAPIView(APIView):
 
 
 class MonoAcquiringWebhookReceiver(APIView):
-
     def post(self, request):
         try:
             verify_signature(request)
@@ -180,7 +181,7 @@ class MonoAcquiringWebhookReceiver(APIView):
         return Response({"status": "ok"})
 
 
-class PaymentStatusView(APIView):
+class PaymentStatusApi(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -208,9 +209,6 @@ class PaymentStatusView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        status_data = {
-            "order_number": order.id,
-            "status": order.status
-        }
+        status_data = {"order_number": order.id, "status": order.status}
 
         return Response(status_data, status=status.HTTP_200_OK)

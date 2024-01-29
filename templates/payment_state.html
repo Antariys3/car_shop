@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Статус покупки товара{% endblock %}
+{% block content %}
+    {% load bootstrap5 %}
+    <div class="container mt-4">
+        {% if not order %}
+            <div class="alert alert-info" role="alert">
+                Вы еще не делали покупок. Выберите себе товар для покупки.
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Информация о заказах:</h2>
+                    {% for ord in order %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Номер заказа: {{ ord.id }}</h5>
+                                <p class="card-text">Статус оплаты: {% if ord.is_paid %} Оплачено {% else %} Не оплачено {% endif %}</p>
+                                {% if not ord.is_paid %}
+                                    <p class="card-text">Ссылка на оплату: <a href="{{ ord.invoice_url }}" class="btn btn-primary">Оплатить</a></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
