@@ -50,7 +50,7 @@ def create_invoice(order: Order, cars, webhook_url):
         "basketOrder": basket_order,
     }
     request_body = {
-        # "redirectUrl": "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/",
+        "redirectUrl": "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/",
         "webHookUrl": webhook_url,
         "amount": amount,
         "merchantPaymInfo": merchants_info,
