@@ -28,7 +28,6 @@ from carshop.views import (
     CarsShopView,
     CarDetailView,
     BasketView,
-    MonoAcquiringWebhookReceiver,
     PaymentStatusView
 )
 
@@ -46,6 +45,5 @@ urlpatterns = [
     path("logout", logout_view, name="logout"),
     path("accounts/", include("allauth.urls"), name="google_login"),
     path("image_edit/", image_edit, name="image_edit"),
-    path("webhook-mono/", MonoAcquiringWebhookReceiver.as_view(), name="webhook-mono"),
     path("payment_status/", PaymentStatusView.as_view(), name="payment_status")
 ]

@@ -149,31 +149,31 @@ class BasketView(View):
         return redirect(order.invoice_url)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(require_POST, name='post')
-class MonoAcquiringWebhookReceiver(View):
-
-    def post(self, request):
-        try:
-            verify_signature(request)
-        except Exception as e:
-            return JsonResponse({"status": "error"}, status=400)
-
-        reference = request.POST.get("reference")
-        order = get_object_or_404(Order, id=reference)
-
-        if order.invoice_id != request.POST.get("invoiceId"):
-            return JsonResponse({"status": "error"}, status=400)
-
-        order.status = request.POST.get("status", "error")
-        order.save()
-
-        if order.status == "success":
-            order.is_paid = True
-            order.save()
-            return JsonResponse({"status": "Paid"}, status=200)
-
-        return JsonResponse({"status": "ok"})
+# @method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(require_POST, name='post')
+# class MonoAcquiringWebhookReceiver(View):
+#
+#     def post(self, request):
+#         try:
+#             verify_signature(request)
+#         except Exception as e:
+#             return JsonResponse({"status": "error"}, status=400)
+#
+#         reference = request.POST.get("reference")
+#         order = get_object_or_404(Order, id=reference)
+#
+#         if order.invoice_id != request.POST.get("invoiceId"):
+#             return JsonResponse({"status": "error"}, status=400)
+#
+#         order.status = request.POST.get("status", "error")
+#         order.save()
+#
+#         if order.status == "success":
+#             order.is_paid = True
+#             order.save()
+#             return JsonResponse({"status": "Paid"}, status=200)
+#
+#         return JsonResponse({"status": "ok"})
 
 
 @method_decorator(login_required, name="dispatch")
