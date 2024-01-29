@@ -1,15 +1,18 @@
+import time
+
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect, resolve_url
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
+from rest_framework.reverse import reverse
+from django.http import Http404
 
 
 from carshop.car_utils import create_clients, crop_image
@@ -40,6 +43,7 @@ class CarsShopView(TemplateView):
         ).select_related("car_type")
         return context
 
+    @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
         client = create_clients(request.user)
         car_id = request.POST.get("car_id")
@@ -65,12 +69,13 @@ class CarsShopView(TemplateView):
 class CarDetailView(View):
     model = Car
     template_name = "car_detail.html"
+    not_found_template_name = "car_not_found.html"
 
     def get(self, request, *args, **kwargs):
         car_id = self.kwargs.get("car_id")
         car = Car.objects.filter(id=car_id).prefetch_related("car_type").first()
         if car is None:
-            raise Http404("Car does not exist")
+            return render(request, self.not_found_template_name)
         cars_count = Car.objects.filter(
             color=car.color,
             year=car.year,
@@ -142,38 +147,9 @@ class BasketView(View):
             "car_type"
         )
         # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
-        webhook_url = resolve_url("webhook-mono")
-
-        create_invoice(order, cars, webhook_url)
+        create_invoice(order, cars, reverse("webhook-mono", request=request))
         print(order.invoice_url)
         return redirect(order.invoice_url)
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(require_POST, name='post')
-class MonoAcquiringWebhookReceiver(View):
-
-    def post(self, request):
-        try:
-            verify_signature(request)
-        except Exception as e:
-            return JsonResponse({"status": "error"}, status=400)
-
-        reference = request.POST.get("reference")
-        order = get_object_or_404(Order, id=reference)
-
-        if order.invoice_id != request.POST.get("invoiceId"):
-            return JsonResponse({"status": "error"}, status=400)
-
-        order.status = request.POST.get("status", "error")
-        order.save()
-
-        if order.status == "success":
-            order.is_paid = True
-            order.save()
-            return JsonResponse({"status": "Paid"}, status=200)
-
-        return JsonResponse({"status": "ok"})
 
 
 @method_decorator(login_required, name="dispatch")
@@ -211,7 +187,11 @@ def delete_order(request, order_id):
 
 def issuance_of_a_license(request, order_id):
     licenses = Licence.objects.filter(order_id=order_id)
-    return render(request, "issuance_of_a_license.html", {"licenses": licenses, "order_id": order_id})
+    return render(
+        request,
+        "issuance_of_a_license.html",
+        {"licenses": licenses, "order_id": order_id},
+    )
 
 
 @login_required

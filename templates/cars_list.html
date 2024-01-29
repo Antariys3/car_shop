@@ -9,36 +9,40 @@
     {% include 'carousel.html' %}
     <div class="sections mt-3">
         <div class="container">
-            <h4 class="text-center">Выберете машины для заказа</h4>
+            {% if cars %}
+                <h4 class="text-center">Выберете машины для заказа</h4>
+                <div class="row">
+                    {% for car in cars %}
+                        <div class="col-lg-4">
 
-            <div class="row">
-                {% for car in cars %}
-                    <div class="col-lg-4">
+                            <div class="car-item">
 
-                        <div class="car-item">
+                                <div>
+                                    <a href="{% url "car_detail" car.id %}">
+                                        <img class="card-img-top-2" src="{{ car.car_type.image.url }}"
+                                             alt="{{ car.car_type.name }}">
+                                    </a>
+                                </div>
+                                <h5> {{ car.car_type.brand }} {{ car.car_type.name }}</h5>
+                                <p class="mb-2">Год {{ car.year }}</p>
+                                <p class="mb-2">Цена: {{ car.car_type.price }}</p>
 
-                            <div>
-                                <a href="{% url "car_detail" car.id %}"> 
-                                    <img class="card-img-top-2" src="{{ car.car_type.image.url }}"
-                                         alt="{{ car.car_type.name }}">
-                                </a>
-                            </div>
-                            <h5> {{ car.car_type.brand }} {{ car.car_type.name }}</h5>
-                            <p class="mb-2">Год {{ car.year }}</p>
-                            <p class="mb-2">Цена: {{ car.car_type.price }}</p>
-                            {% if request.user.is_authenticated %}
                                 <div class="add-to-cart-btn">
                                     <form method="post" action="{% url 'cars_list' %}">
                                         {% csrf_token %}
                                         <input type="hidden" name="car_id" value="{{ car.id }}">
-                                        <button type="submit" class="btn btn-dark text-white">Добавить в корзину</button>
+                                        <button type="submit" class="btn btn-dark text-white">Добавить в корзину
+                                        </button>
                                     </form>
                                 </div>
-                            {% endif %}
+
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h4 class="text-center">БД пустая, добавьте машины</h4>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
