@@ -25,17 +25,28 @@ def create_clients(user):
 
 
 def crop_image(image):
-    # function that crops the image to an aspect ratio of 4:3
+    # function that crops the image to an aspect ratio of 16:9
     img = Image.open(image)
     aspect_ratio = 16 / 9
     width, height = img.size
-    new_width = int(height * aspect_ratio)
-    left_margin = int((width - new_width) / 2)
-    right_margin = int(width - left_margin)
-    img_cropped = img.crop((left_margin, 0, right_margin, height))
+    target_width = int(height * aspect_ratio)
+
+    # Если ширина изображения больше целевой, обрезаем по бокам
+    if width > target_width:
+        left_margin = int((width - target_width) / 2)
+        right_margin = int(width - left_margin)
+        img_cropped = img.crop((left_margin, 0, right_margin, height))
+    # Если высота изображения больше целевой, обрезаем сверху и снизу
+    elif width < target_width:
+        target_height = int(width / aspect_ratio)
+        top_margin = int((height - target_height) / 2)
+        bottom_margin = int(height - top_margin)
+        img_cropped = img.crop((0, top_margin, width, bottom_margin))
+    else:
+        img_cropped = img.copy()
 
     img_cropped = img_cropped.convert("RGB")
     output_buffer = BytesIO()
-    img_cropped.save(output_buffer, format="JPEG")
+    img_cropped.save(output_buffer, format="PNG")
 
-    return ContentFile(output_buffer.getvalue())
+    return ContentFile(output_buffer.getvalue(), name=image.name)

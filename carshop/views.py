@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -185,7 +187,11 @@ def delete_order(request, order_id):
 
 def issuance_of_a_license(request, order_id):
     licenses = Licence.objects.filter(order_id=order_id)
-    return render(request, "issuance_of_a_license.html", {"licenses": licenses, "order_id": order_id})
+    return render(
+        request,
+        "issuance_of_a_license.html",
+        {"licenses": licenses, "order_id": order_id},
+    )
 
 
 @login_required
