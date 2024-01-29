@@ -4,12 +4,12 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect, resolve_url
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
+from rest_framework.reverse import reverse
 
 
 from carshop.car_utils import create_clients, crop_image
@@ -142,9 +142,7 @@ class BasketView(View):
             "car_type"
         )
         # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
-        webhook_url = resolve_url("webhook-mono")
-
-        create_invoice(order, cars, webhook_url)
+        create_invoice(order, cars, reverse("webhook-mono", request=request))
         print(order.invoice_url)
         return redirect(order.invoice_url)
 
