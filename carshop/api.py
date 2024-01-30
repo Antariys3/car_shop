@@ -1,3 +1,4 @@
+import django_filters.rest_framework
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
@@ -5,10 +6,11 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import filters
 
 from carshop.car_utils import create_clients
 from carshop.invoices import create_invoice, verify_signature
@@ -57,6 +59,14 @@ class CarsAPIView(viewsets.ModelViewSet):
     serializer_class = CarSerializer
     http_method_names = ["get"]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_fields = ["year", "car_type__price"]
+    search_fields = ["car_type__brand", "car_type__name"]
+    ordering_fields = ["year", "car_type__price"]
 
 
 class AddToCartAPIView(APIView):

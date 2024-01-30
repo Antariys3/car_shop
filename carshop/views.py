@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from rest_framework.reverse import reverse
 from django.http import Http404
 
@@ -31,17 +31,14 @@ def index(request):
     return render(request, "index.html", {"user": request.user})
 
 
-class CarsShopView(TemplateView):
+class CarsShopView(ListView):
+    paginate_by = 12
     model = Car
     template_name = "cars_list.html"
     context_object_name = "cars"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["cars"] = Car.objects.filter(
-            blocked_by_order=None, owner=None
-        ).select_related("car_type")
-        return context
+    def get_queryset(self):
+        return Car.objects.filter(blocked_by_order=None, owner=None).select_related("car_type")
 
     @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
@@ -60,10 +57,8 @@ class CarsShopView(TemplateView):
         car.block(order)
         car.add_owner(client)
 
-        cars = Car.objects.filter(blocked_by_order=None, owner=None).select_related(
-            "car_type"
-        )
-        return render(request, "cars_list.html", {"cars": cars})
+        self.object_list = self.get_queryset()
+        return self.render_to_response(self.get_context_data())
 
 
 class CarDetailView(View):

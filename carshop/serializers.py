@@ -29,6 +29,8 @@ class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = ("id", "car_type", "color", "year")
+        # second way to open a nested dictionary
+        # depth = 1
 
 
 class OrderQuantitySerializer(serializers.ModelSerializer):

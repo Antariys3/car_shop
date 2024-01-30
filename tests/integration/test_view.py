@@ -46,4 +46,3 @@ def test_get_api_car_by_id():
     )
     expected_response["car_type"]["image"] = response.json()["car_type"]["image"]
     assert response.json() == expected_response
-
