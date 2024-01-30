@@ -7,5 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Check code formatting
-        run: black --check .
+      - uses: psf/black@stable
