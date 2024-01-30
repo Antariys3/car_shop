@@ -31,12 +31,12 @@ def crop_image(image):
     width, height = img.size
     target_width = int(height * aspect_ratio)
 
-    # Если ширина изображения больше целевой, обрезаем по бокам
+    # If the image width is larger than the target width, crop the sides
     if width > target_width:
         left_margin = int((width - target_width) / 2)
         right_margin = int(width - left_margin)
         img_cropped = img.crop((left_margin, 0, right_margin, height))
-    # Если высота изображения больше целевой, обрезаем сверху и снизу
+    # If the image height is greater than the target, crop the top and bottom
     elif width < target_width:
         target_height = int(width / aspect_ratio)
         top_margin = int((height - target_height) / 2)
