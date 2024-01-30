@@ -96,3 +96,51 @@ img.img-article-left {
 .alert{
     margin_bottom: 0px;
 }
+
+.list-pages {
+	text-align: center;
+	margin: 0 0 20px 0;
+}
+.list-pages ul {
+	margin: 20px 0 0 0;
+	padding: 0;
+	list-style: none;
+}
+.list-pages ul li {
+    display: inline-block;
+    margin: 0 20px 0 0;
+    border-radius: 50%;
+    overflow: hidden;
+    vertical-align: middle;
+    background-color: #d0d0d0;
+    transition: background-color 0.3s;
+}
+
+.list-pages .page-num, .list-pages .page-num-selected {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    padding: 8px 0 0 0;
+    border: none;
+    background-color: #d0d0d0;
+    color: #000;
+    font-size: 20px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.list-pages .page-num:hover {
+    box-shadow: 3px 3px 1px #d0d0d0;
+    background-color: #b0b0b0;
+}
+
+.list-pages .page-num-selected {
+    color: #fff;
+    background-color: #000;
+    font-weight: bold;
+}
+
+.list-pages .page-num-selected:hover {
+    box-shadow: none;
+    background-color: #000;
+}
