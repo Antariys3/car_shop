@@ -22,6 +22,7 @@ alfa_romeo_image = "carshop/static/database_autocomplete/alfa-romeo-red_2.jpg"
 audi_image = "carshop/static/database_autocomplete/audi A-6_2.jpg"
 bmv_image = "carshop/static/database_autocomplete/BMW_M5_F90.png"
 passat_image = "carshop/static/database_autocomplete/volkswagen-passat_2.jpg"
+mercedes_image = "carshop/static/database_autocomplete/Mercedes_C205.png"
 
 alfa_romeo = CarsGenerator(
     "Alfa Romeo",
@@ -43,10 +44,19 @@ passat = CarsGenerator(
     passat_image,
     "volkswagen-passat_2.jpg",
 )
+mercedes = CarsGenerator(
+    "Mercedes-Benz",
+    "C205",
+    23000,
+    "white",
+    "2022",
+    mercedes_image,
+    "Mercedes_C205.png",
+)
 
 
 def generate_cars(self, car_gen):
-    for _ in range(3):
+    for _ in range(4):
         try:
             with transaction.atomic():
                 car_type = CarType.objects.create(
@@ -77,3 +87,4 @@ class Command(BaseCommand):
         generate_cars(self, audi)
         generate_cars(self, alfa_romeo)
         generate_cars(self, passat)
+        generate_cars(self, mercedes)

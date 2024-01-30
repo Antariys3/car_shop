@@ -38,7 +38,7 @@ MONOBANK_TOKEN='foo'
 ```
 python manage.py migrate
 ```
-8. Add cars to the database (12 cars).
+8. Add cars to the database (20 cars).
 ```
 python manage.py generate_cars
 ```
