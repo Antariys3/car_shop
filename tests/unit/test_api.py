@@ -50,32 +50,37 @@ class TestCarsApi(APITransactionTestCase):
     def test_cars_list(self):
         response = self.client.get("/api/cars/")
         assert response.status_code == 200
-        assert response.json() == [
-            {
-                "id": 2,
-                "car_type": {
+        assert response.json() == {
+            "count": 2,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
                     "id": 2,
-                    "name": "A-6",
-                    "brand": "AUDI",
-                    "price": 12000,
-                    "image": "http://testserver/carshop/static/media/audi_rs-6.jpg",
+                    "car_type": {
+                        "id": 2,
+                        "name": "A-6",
+                        "brand": "AUDI",
+                        "price": 12000,
+                        "image": "http://testserver/carshop/static/media/audi_rs-6.jpg",
+                    },
+                    "color": "белый",
+                    "year": 2012,
                 },
-                "color": "белый",
-                "year": 2012,
-            },
-            {
-                "id": 1,
-                "car_type": {
+                {
                     "id": 1,
-                    "name": "Passat",
-                    "brand": "Volkswagen",
-                    "price": 10000,
-                    "image": "http://testserver/carshop/static/media/audi_rs-6.jpg",
+                    "car_type": {
+                        "id": 1,
+                        "name": "Passat",
+                        "brand": "Volkswagen",
+                        "price": 10000,
+                        "image": "http://testserver/carshop/static/media/audi_rs-6.jpg",
+                    },
+                    "color": "black",
+                    "year": 2010,
                 },
-                "color": "black",
-                "year": 2010,
-            },
-        ]
+            ],
+        }
 
 
 class TestBasketApi(APITransactionTestCase):
