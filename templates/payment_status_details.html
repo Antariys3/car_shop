@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Информация о заказе № {{ order.0.order_id }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>Информация о заказе № {{ order.0.order_id }}</h2>
+        <div class="card">
+            <div class="card-body">
+                {% if cars_in_order %}
+                    <h3>Машины в заказе:</h3>
+                    <ul>
+                        {% for car_info in cars_in_order %}
+                            <li>
+                                <strong>Бренд:</strong> {{ car_info.brand }}<br>
+                                <strong>Название:</strong> {{ car_info.name }}<br>
+                                <strong>Цена:</strong> {{ car_info.price }}<br>
+                                {% if car_info.image %}
+                                    <img src="{{ car_info.image }}" alt="Car Image" width="100">
+                                {% endif %}
+                                <hr>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Нет информации о машинах в заказе.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

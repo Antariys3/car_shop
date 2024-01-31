@@ -149,14 +149,40 @@ class PaymentStatusView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         owner = Client.objects.filter(email=request.user.email).first()
-        print(owner)
         if not owner:
             return render(request, self.template_name, {"order": owner})
         order = Order.objects.filter(client_id=owner)
-        print(order)
         if not order:
             return render(request, self.template_name, {"order": order})
         return render(request, self.template_name, {"order": order})
+
+
+@method_decorator(login_required, name="dispatch")
+class PaymentStatusDetailsView(TemplateView):
+    template_name = "payment_status_details.html"
+
+    def get(self, request, *args, **kwargs):
+        order_id = kwargs.get("order_id")
+
+        order_quantities = OrderQuantity.objects.filter(order=order_id)
+
+        cars_in_order = [
+            {
+                "brand": order_quantity.car_type.brand,
+                "name": order_quantity.car_type.name,
+                "price": order_quantity.car_type.price,
+                "image": order_quantity.car_type.image.url
+                if order_quantity.car_type.image
+                else None,
+            }
+            for order_quantity in order_quantities
+        ]
+
+        return render(
+            request,
+            self.template_name,
+            {"cars_in_order": cars_in_order, "order": order_quantities},
+        )
 
 
 def orders_page(request):
