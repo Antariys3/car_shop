@@ -1,22 +1,15 @@
-import time
-
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect, resolve_url
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, ListView
 from rest_framework.reverse import reverse
-from django.http import Http404
-
 
 from carshop.car_utils import create_clients, crop_image
-from carshop.invoices import create_invoice, verify_signature
+from carshop.invoices import create_invoice
 from .forms import CreateCarsForm
 from .models import CarType, OrderQuantity, Car, Licence, Client
 from .models import Order
@@ -38,7 +31,9 @@ class CarsShopView(ListView):
     context_object_name = "cars"
 
     def get_queryset(self):
-        return Car.objects.filter(blocked_by_order=None, owner=None).select_related("car_type")
+        return Car.objects.filter(blocked_by_order=None, owner=None).select_related(
+            "car_type"
+        )
 
     @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
@@ -154,14 +149,42 @@ class PaymentStatusView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         owner = Client.objects.filter(email=request.user.email).first()
-        print(owner)
         if not owner:
             return render(request, self.template_name, {"order": owner})
         order = Order.objects.filter(client_id=owner)
-        print(order)
         if not order:
             return render(request, self.template_name, {"order": order})
         return render(request, self.template_name, {"order": order})
+
+
+@method_decorator(login_required, name="dispatch")
+class PaymentStatusDetailsView(TemplateView):
+    template_name = "payment_status_details.html"
+
+    def get(self, request, *args, **kwargs):
+        order_id = kwargs.get("order_id")
+
+        order_quantities = OrderQuantity.objects.filter(order=order_id)
+
+        cars_in_order = [
+            {
+                "brand": order_quantity.car_type.brand,
+                "name": order_quantity.car_type.name,
+                "price": order_quantity.car_type.price,
+                "image": (
+                    order_quantity.car_type.image.url
+                    if order_quantity.car_type.image
+                    else None
+                ),
+            }
+            for order_quantity in order_quantities
+        ]
+
+        return render(
+            request,
+            self.template_name,
+            {"cars_in_order": cars_in_order, "order": order_quantities},
+        )
 
 
 def orders_page(request):

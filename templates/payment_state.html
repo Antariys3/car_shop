@@ -15,7 +15,7 @@
                     {% for ord in order %}
                         <div class="card mb-3">
                             <div class="card-body">
-                                <h5 class="card-title">Номер заказа: {{ ord.id }}</h5>
+                                <h5 class="card-title"><a href="{% url 'payment_status_details' ord.id %}">Номер заказа: {{ ord.id }}</a></h5>
                                 <p class="card-text">Статус покупки: {% if ord.is_paid %} Оплачено {% else %} Не оплачено {% endif %}</p>
                                 {% if not ord.is_paid %}
                                     <p class="card-text">Ссылка на оплату: <a href="{{ ord.invoice_url }}" class="btn btn-primary">Оплатить</a></p>
