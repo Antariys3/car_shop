@@ -171,9 +171,11 @@ class PaymentStatusDetailsView(TemplateView):
                 "brand": order_quantity.car_type.brand,
                 "name": order_quantity.car_type.name,
                 "price": order_quantity.car_type.price,
-                "image": order_quantity.car_type.image.url
-                if order_quantity.car_type.image
-                else None,
+                "image": (
+                    order_quantity.car_type.image.url
+                    if order_quantity.car_type.image
+                    else None
+                ),
             }
             for order_quantity in order_quantities
         ]
