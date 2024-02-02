@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
+    "crispy_forms",
 ]
 
 MIDDLEWARE = [
@@ -270,3 +271,5 @@ REST_FRAMEWORK = {
 }
 
 MONOBANK_TOKEN = os.getenv("MONOBANK_TOKEN")
+
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
