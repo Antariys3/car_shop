@@ -31,6 +31,7 @@ from carshop.views import (
     BasketView,
     PaymentStatusView,
     PaymentStatusDetailsView,
+    CustomSignupView,
 )
 
 urlpatterns = [
@@ -52,6 +53,7 @@ urlpatterns = [
     path('login/', include('allauth.account.urls'), name='account_login'),
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('allauth.socialaccount.urls')),
+    path('signup/', CustomSignupView.as_view(), name='custom_signup'),
 
     path("image_edit/", image_edit, name="image_edit"),
     path("payment_status/", PaymentStatusView.as_view(), name="payment_status"),

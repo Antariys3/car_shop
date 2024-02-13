@@ -1,3 +1,4 @@
+from allauth.account.views import SignupView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -10,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from carshop.car_utils import create_clients, crop_image
 from carshop.invoices import create_invoice
-from .forms import CreateCarsForm
+from .forms import CreateCarsForm, CustomSignupForm
 from .models import CarType, OrderQuantity, Car, Licence, Client
 from .models import Order
 
@@ -138,7 +139,6 @@ class BasketView(View):
         )
         # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
-        print(order.invoice_url)
         return redirect(order.invoice_url)
 
 
@@ -270,3 +270,7 @@ def image_edit(request):
                     car_type.image.save(f"{image_file}", crop_image(image_file))
 
         return redirect("cars_list")
+
+
+class CustomSignupView(SignupView):
+    form_class = CustomSignupForm

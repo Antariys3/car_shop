@@ -40,8 +40,7 @@
                             <p>{% trans "Если у вас еще нет учетной записи, пожалуйста," %}
                                 <a href="{{ signup_url }}" class="col-md-12 btn btn-info">{% trans "Зарегистрируйтесь" %}</a>
                             </p>
-                            
-                            {# Добавляем кнопку для входа через Google #}
+                        
                             <a href="{% provider_login_url 'google' %}" class="col-md-12 btn btn-success">
                                 {% trans "Вход через Google" %}
                             </a>
@@ -53,4 +52,3 @@
         </div>
     </div>
 {% endblock content %}
-{#Всё работает#}
