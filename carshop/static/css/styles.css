@@ -144,3 +144,8 @@ img.img-article-left {
     box-shadow: none;
     background-color: #000;
 }
+
+.prominent.login.btn-dark {
+    font-size: 17px;
+    padding: 5px 55px;
+}

@@ -3,36 +3,52 @@
 {% load i18n %}
 {% load allauth account socialaccount %}
 {% block head_title %}
-    {% trans "Sign In" %}
+    {% trans "Вход" %}
 {% endblock head_title %}
 
 {% block content %}
-    <div class="container" >
-    {% element h1 %}
-        {% trans "Sign In" %}
-    {% endelement %}
-    <p>
-        {% blocktrans %}If you have not created an account yet, then please
-            <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}
-    </p>
-    {% url 'account_login' as login_url %}
-    {% element form form=form method="post" action=login_url tags="entrance,login" %}
-        {% slot body %}
-            {% csrf_token %}
-            {% element fields form=form unlabeled=True %}
-            {% endelement %}
-            {% if redirect_field_value %}
-                <input type="hidden"
-                       name="{{ redirect_field_name }}"
-                       value="{{ redirect_field_value }}"/>
-            {% endif %}
-        {% endslot %}
-        {% slot actions %}
-            {% element button type="submit" tags="prominent,login" %}
-                {% trans "Sign In" %}
-            {% endelement %}
-        {% endslot %}
-    {% endelement %}
-    {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    <div class="form-content my-3 p-3">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-5">
+                    <div class="card shadow-lg border-0 rounded-lg mt-0 mb-3">
+                        <div class="card-header justify-content-center">
+                            <div id="error_div"></div>
+                            <h3 class="font-weight-light my-4 text-center">{% trans "Вход" %}</h3>
+                        </div>
+                        {% if form.errors %}
+                            <p>{% trans "Your username and password didn't match. Please try again." %}</p>
+                        {% endif %}
+
+                        {% if next %}
+                            {% if user.is_authenticated %}
+                                <p>{% trans "Your account doesn't have access to this page. To proceed, please login with an account that has access." %}</p>
+                            {% else %}
+                                <p>{% trans "Please login to see this page." %}</p>
+                            {% endif %}
+                        {% endif %}
+                        <div class="card-body">
+                            <form method="post" action="{% url 'account_login' %}" class="entrance login">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                {% if redirect_field_value %}
+                                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                                {% endif %}
+                                <button type="submit" class="col-md-12 btn btn-dark">{% trans "Войти" %}</button>
+                            </form>
+                            <hr>
+                            <p>{% trans "Если у вас еще нет учетной записи, пожалуйста," %}
+                                <a href="{{ signup_url }}" class="col-md-12 btn btn-info">{% trans "Зарегистрируйтесь" %}</a>
+                            </p>
+                        
+                            <a href="{% provider_login_url 'google' %}" class="col-md-12 btn btn-success">
+                                {% trans "Вход через Google" %}
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock content %}
