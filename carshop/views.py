@@ -37,7 +37,7 @@ class CarsShopView(ListView):
     # processing the add to cart button
     def post(self, request, *args, **kwargs):
 
-        client = User.objects.filter(username=request.user).first()
+        client = request.user
         car_id = request.POST.get("car_id")
         car = Car.objects.select_related("car_type").get(id=car_id)
 
@@ -114,8 +114,7 @@ class BasketView(View):
     template_name = "basket.html"
 
     def get(self, request, *args, **kwargs):
-        owner = User.objects.filter(email=request.user.email).first()
-        order = Order.objects.filter(is_paid=False, client_id=owner).first()
+        order = Order.objects.filter(is_paid=False, client_id=request.user).first()
         if order is None:
             return render(request, self.template_name, {"order": order})
         cars = Car.objects.filter(blocked_by_order=order).select_related("car_type")
@@ -128,13 +127,12 @@ class BasketView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        client = User.objects.filter(email=request.user.email).first()
 
         order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
-        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related(
-            "car_type"
-        )
+        cars = Car.objects.filter(
+            blocked_by_order=order, owner=request.user
+        ).select_related("car_type")
         # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
         return redirect(order.invoice_url)
@@ -146,7 +144,7 @@ class PaymentStatusView(TemplateView):
     template_name = "payment_state.html"
 
     def get(self, request, *args, **kwargs):
-        owner = User.objects.filter(email=request.user.email).first()
+        owner = request.user
         if not owner:
             return render(request, self.template_name, {"order": owner})
         order = Order.objects.filter(client_id=owner)

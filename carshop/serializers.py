@@ -7,11 +7,11 @@ from .models import Car, CarType, User, Order, OrderQuantity, Licence
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ["username", "email"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    user = UserSerializer(source='client')
+    user = UserSerializer(source="client")
 
     class Meta:
         model = Order
