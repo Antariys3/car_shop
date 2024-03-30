@@ -19,7 +19,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 from carshop.views import (
-    index,
     orders_page,
     delete_order,
     issuance_of_a_license,
@@ -37,7 +36,6 @@ from carshop.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("carshop.urls")),
-    path("index/", index, name="home"),
     path("", CarsShopView.as_view(), name="cars_list"),
     path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
     path("basket/", BasketView.as_view(), name="basket"),

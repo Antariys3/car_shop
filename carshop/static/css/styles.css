@@ -149,3 +149,19 @@ img.img-article-left {
     font-size: 17px;
     padding: 5px 55px;
 }
+
+ /* Add custom CSS for the navbar */
+.navbar-fixed {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 500; /* Ensure the navbar is above other elements */
+}
+
+/* Add padding to the body to compensate for the fixed navbar */
+body {
+    padding-top: 68px;
+}
+header {
+    height: 70px; /* Задайте желаемую высоту навбара */
+}

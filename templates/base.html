@@ -17,10 +17,10 @@
     {% bootstrap_messages %}
 
 
-
 </head>
 <body>
-<header class="p-3 bg-dark text-white">
+ {# navbar block #}
+<header class="navbar-fixed p-3 bg-dark text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
@@ -30,11 +30,11 @@
             </ul>
             <div class="text-end">
                 {% if request.user.is_authenticated %}
-                    {% if user.first_name %}
-                                {{ user.first_name }} &nbsp; &nbsp;
-                            {% else %}
-                                {{ user.username }} &nbsp; &nbsp;
-                            {% endif %}
+                    {% if user.first_name and user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }} &nbsp; &nbsp;
+                    {% else %}
+                        {{ user.username }} &nbsp; &nbsp;
+                    {% endif %}
                     <a href="{% url 'payment_status' %}" class="btn btn-success">Мои покупки</a>
                     <a href="{% url 'basket' %}" class="btn btn-success">Корзина</a>
                     <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
