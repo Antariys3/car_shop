@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView
 from rest_framework.reverse import reverse
 
-from carshop.car_utils import crop_image
+from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
 from .forms import CreateCarsForm, CustomSignupForm
 from .models import CarType, OrderQuantity, Car, Licence

@@ -128,7 +128,6 @@ class CartAPIView(APIView):
             "car_type"
         )
 
-        # create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
 
         return Response({"invoice_url": order.invoice_url})

@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from carshop.models import Car, CarType
-from carshop.car_utils import crop_image
+from carshop.images_processing import crop_image
 
 
 class CarsGenerator:

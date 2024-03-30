@@ -3,8 +3,6 @@ from io import BytesIO
 from PIL import Image
 from django.core.files.base import ContentFile
 
-from carshop.models import Client
-
 
 def crop_image(image):
     # function that crops the image to an aspect ratio of 16:9
