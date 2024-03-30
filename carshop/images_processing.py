@@ -2,26 +2,6 @@ from io import BytesIO
 
 from PIL import Image
 from django.core.files.base import ContentFile
-from faker import Faker
-
-from carshop.models import Client
-
-fake = Faker("ru_RU")
-
-
-def create_clients(user):
-    client = Client.objects.filter(email=user.email).first()
-    if client:
-        return client
-
-    if user.first_name and user.last_name:
-        client_name = f"{user.first_name} {user.last_name}"
-    else:
-        client_name = user.username
-    client = Client.objects.create(
-        name=client_name, email=user.email, phone=fake.phone_number()
-    )
-    return client
 
 
 def crop_image(image):

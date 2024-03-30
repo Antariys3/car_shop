@@ -10,7 +10,11 @@
             <p>Информация о заказе:</p>
             <ul>
                 <li><strong>Номер заказа:</strong> {{ order.id }}</li>
-                <li><strong>Клиент:</strong> {{ order.client }}</li>
+                <li><strong>Клиент:</strong> {% if user.first_name and user.last_name %}
+                                {{ user.first_name }} {{ user.last_name }} &nbsp; &nbsp;
+                            {% else %}
+                                {{ user.username }} &nbsp; &nbsp;
+                            {% endif %}</li>
                 <li><strong>Оплачено:</strong> {% if order.is_paid %}Да{% else %}Нет{% endif %}</li>
             </ul>
 

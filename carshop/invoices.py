@@ -7,14 +7,15 @@ from django.conf import settings
 
 from carshop.models import Order
 
-public_key = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFc05mWXpNR1hIM2VXVHkzWnFuVzVrM3luVG5CYgpnc3pXWnhkOStObEtveDUzbUZEVTJONmU0RlBaWmsvQmhqamgwdTljZjVFL3JQaU1EQnJpajJFR1h3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+PUBLIC_KEY = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFc05mWXpNR1hIM2VXVHkzWnFuVzVrM3luVG5CYgpnc3pXWnhkOStObEtveDUzbUZEVTJONmU0RlBaWmsvQmhqamgwdTljZjVFL3JQaU1EQnJpajJFR1h3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+REDIRECT_URL = "REDIRECT_URL', 'https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/"
 
 
 def verify_signature(request):
     x_sing_base64 = request.headers["X-Sign"]
     body_test = request.body
     print(body_test)
-    public_key_bytes = base64.b64decode(public_key)
+    public_key_bytes = base64.b64decode(PUBLIC_KEY)
     signature_bytes = base64.b64decode(x_sing_base64)
     pub_key = ecdsa.VerifyingKey.from_pem(public_key_bytes.decode())
 
@@ -50,7 +51,7 @@ def create_invoice(order: Order, cars, webhook_url):
         "basketOrder": basket_order,
     }
     request_body = {
-        "redirectUrl": "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/",
+        "redirectUrl": REDIRECT_URL,
         "webHookUrl": webhook_url,
         "amount": amount,
         "merchantPaymInfo": merchants_info,

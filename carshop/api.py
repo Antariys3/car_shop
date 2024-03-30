@@ -12,13 +12,12 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from rest_framework import filters
 
-from carshop.car_utils import create_clients
 from carshop.invoices import create_invoice, verify_signature
 from carshop.serializers import (
     CarSerializer,
     OrderSerializer,
 )
-from .models import Order, OrderQuantity, Car, Client
+from .models import Order, OrderQuantity, Car
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -27,7 +26,6 @@ class CustomObtainAuthToken(ObtainAuthToken):
         password = request.data.get("password")
         email = request.data.get("email")
 
-        # Try to get the user
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
@@ -74,7 +72,7 @@ class AddToCartAPIView(APIView):
 
     def post(self, request, car_id, *args, **kwargs):
         # adding a car to basket
-        client = create_clients(request.user)
+        client = User.objects.filter(username=request.user).first()
         order, created = Order.objects.get_or_create(client=client, is_paid=False)
         order_serializer = OrderSerializer(data=client)
         if order_serializer.is_valid():
@@ -101,7 +99,7 @@ class CartAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         # view cart with cars
-        owner = Client.objects.filter(email=request.user.email).first()
+        owner = User.objects.filter(email=request.user.email).first()
         order = Order.objects.filter(is_paid=False, client_id=owner).first()
         if order is None:
             return Response(
@@ -119,7 +117,7 @@ class CartAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         # buying a car and issuing registration numbers
-        client = Client.objects.filter(email=request.user.email).first()
+        client = User.objects.filter(email=request.user.email).first()
         order = get_object_or_404(
             Order,
             client_id=client,
@@ -130,14 +128,13 @@ class CartAPIView(APIView):
             "car_type"
         )
 
-        # create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
 
         return Response({"invoice_url": order.invoice_url})
 
     def delete(self, request, *args, **kwargs):
         # a method that removes a cart or one car
-        owner = Client.objects.filter(email=request.user.email).first()
+        owner = User.objects.filter(email=request.user.email).first()
         order = Order.objects.filter(is_paid=False, client_id=owner).first()
 
         if order is None:
@@ -194,8 +191,8 @@ class MonoAcquiringWebhookReceiver(APIView):
 class PaymentStatusApi(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        owner = Client.objects.filter(email=request.user.email).first()
+    def get(self, request, order_number, *args, **kwargs):
+        owner = User.objects.filter(email=request.user.email).first()
 
         if not owner:
             return Response(

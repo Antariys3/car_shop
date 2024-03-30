@@ -238,23 +238,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /payment-status/:
+  /payment_status/{order_number}/:
     get:
       summary: Retrieve Order Status
       parameters:
         - name: order_number
-          in: query
+          in: path
           required: true
           description: Order number
           schema:
             type: integer
+          example: 3
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               example:
-                order_number: 31
+                order_number: 3
                 status: success
         '400':
           description: Bad Request
@@ -296,7 +297,7 @@ components:
           example: "password"
         email:
           type: string
-          example: "123username@gmail.com"
+          example: "123username@example.com"
     Car:
       type: object
       required:
@@ -369,83 +370,44 @@ components:
     Order:
       type: object
       required:
-        - client
+        - id
+        - user
         - is_paid
+        - invoice_url
+        - status
+        - invoice_id
+        - client
       properties:
         id:
           type: integer
-          example: 1
-        client:
-          type: string
-          example: "Jack"
+          example: 10
+        user:
+          type: object
+          properties:
+            username:
+              type: string
+              example: "JohnDoe"
+            email:
+              type: string
+              example: "johndoe@example.com"
+          required:
+            - username
+            - email
         is_paid:
           type: boolean
-          example: False
-    OrderQuantity:
-      type: object
-      required:
-        - car_type
-        - quantity
-        - order
-      properties:
-        id:
-          type: integer
-          example: 1
-        car_type:
-          type: integer
-          example: 1
-        quantity:
-          type: integer
-          example: 1
-        order:
-          type: integer
-          example: 1
-    OrderQuantities:
-      type: array
-      items:
-        $ref: "#/components/schemas/OrderQuantity"
-    Licence:
-      type: object
-      required:
-        - car
-        - number
-        - order
-      properties:
-        id:
-          type: integer
-          example: 1
-        car:
-          type: integer
-          example: 1
-        number:
+          example: false
+        invoice_url:
           type: string
-          example: "AX 5456 ZD"
-        order:
+          example: "https://pay.mbnk.biz/2403242twP68kjfWxjbV"
+        status:
+          type: string
+          example: "created"
+        invoice_id:
+          type: string
+          example: "2403242twP68kjfWxjbV"
+        client:
           type: integer
-          example: 1
-    Licences:
-      type: array
-      items:
-        $ref: "#/components/schemas/Licence"
-    Client:
-      type: object
-      required:
-        - name
-        - email
-        - phone
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: "Касьянов Михаил"
-        email:
-          type: string
-          example: "mihail.kasyanov@gmail.com"
-        phone:
-          type: string
-          example: "+48 123-45-67"
+          example: 5
     CartResponse:
       type: object
       properties:
@@ -460,6 +422,7 @@ components:
                 $ref: "#/components/schemas/Car"
             total_price:
               type: integer
+              example: 15000
           required:
             - order
             - cars

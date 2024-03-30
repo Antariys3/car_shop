@@ -1,6 +1,7 @@
 from allauth.account.views import SignupView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
@@ -9,20 +10,16 @@ from django.views import View
 from django.views.generic import TemplateView, ListView
 from rest_framework.reverse import reverse
 
-from carshop.car_utils import create_clients, crop_image
+from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
 from .forms import CreateCarsForm, CustomSignupForm
-from .models import CarType, OrderQuantity, Car, Licence, Client
+from .models import CarType, OrderQuantity, Car, Licence
 from .models import Order
 
 
 def logout_view(request):
     logout(request)
     return redirect("cars_list")
-
-
-def index(request):
-    return render(request, "index.html", {"user": request.user})
 
 
 class CarsShopView(ListView):
@@ -37,8 +34,10 @@ class CarsShopView(ListView):
         )
 
     @method_decorator(login_required, name="dispatch")
+    # processing the add to cart button
     def post(self, request, *args, **kwargs):
-        client = create_clients(request.user)
+
+        client = request.user
         car_id = request.POST.get("car_id")
         car = Car.objects.select_related("car_type").get(id=car_id)
 
@@ -81,9 +80,7 @@ class CarDetailView(View):
 
     @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
-        client = create_clients(request.user)
-        if client is None:
-            return redirect("login")
+        client = User.objects.filter(username=request.user).first()
         car_id = self.kwargs.get("car_id")
         quantity = int(request.POST.get("number"))
         car = Car.objects.select_related("car_type").get(id=car_id)
@@ -117,8 +114,7 @@ class BasketView(View):
     template_name = "basket.html"
 
     def get(self, request, *args, **kwargs):
-        owner = Client.objects.filter(email=request.user.email).first()
-        order = Order.objects.filter(is_paid=False, client_id=owner).first()
+        order = Order.objects.filter(is_paid=False, client_id=request.user).first()
         if order is None:
             return render(request, self.template_name, {"order": order})
         cars = Car.objects.filter(blocked_by_order=order).select_related("car_type")
@@ -131,12 +127,12 @@ class BasketView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        client = Client.objects.filter(email=request.user.email).first()
+
         order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
-        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related(
-            "car_type"
-        )
+        cars = Car.objects.filter(
+            blocked_by_order=order, owner=request.user
+        ).select_related("car_type")
         # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
         return redirect(order.invoice_url)
@@ -148,7 +144,7 @@ class PaymentStatusView(TemplateView):
     template_name = "payment_state.html"
 
     def get(self, request, *args, **kwargs):
-        owner = Client.objects.filter(email=request.user.email).first()
+        owner = request.user
         if not owner:
             return render(request, self.template_name, {"order": owner})
         order = Order.objects.filter(client_id=owner)
