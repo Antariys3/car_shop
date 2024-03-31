@@ -106,12 +106,12 @@ class CarDetailView(View):
 
             car.block(order)
             car.add_owner(client)
-        return redirect("basket")
+        return redirect("cart")
 
 
 @method_decorator(login_required, name="dispatch")
-class BasketView(View):
-    template_name = "basket.html"
+class CartView(View):
+    template_name = "cart.html"
 
     def get(self, request, *args, **kwargs):
         order = Order.objects.filter(is_paid=False, client_id=request.user).first()
@@ -133,7 +133,6 @@ class BasketView(View):
         cars = Car.objects.filter(
             blocked_by_order=order, owner=request.user
         ).select_related("car_type")
-        # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
         return redirect(order.invoice_url)
 
@@ -183,11 +182,6 @@ class PaymentStatusDetailsView(TemplateView):
         )
 
 
-def orders_page(request):
-    list_orders = Order.objects.filter(is_paid=False)
-    return render(request, "orders_page.html", {"list_orders": list_orders})
-
-
 def delete_order(request, order_id):
     cars = Car.objects.filter(blocked_by_order=order_id)
     for car in cars:
@@ -198,14 +192,6 @@ def delete_order(request, order_id):
 
     return redirect("cars_list")
 
-
-def issuance_of_a_license(request, order_id):
-    licenses = Licence.objects.filter(order_id=order_id)
-    return render(
-        request,
-        "issuance_of_a_license.html",
-        {"licenses": licenses, "order_id": order_id},
-    )
 
 
 @login_required

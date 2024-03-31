@@ -19,15 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 
 from carshop.views import (
-    orders_page,
     delete_order,
-    issuance_of_a_license,
     sell_cars,
     logout_view,
     image_edit,
     CarsShopView,
     CarDetailView,
-    BasketView,
+    CartView,
     PaymentStatusView,
     PaymentStatusDetailsView,
     CustomSignupView,
@@ -38,14 +36,8 @@ urlpatterns = [
     path("api/", include("carshop.urls")),
     path("", CarsShopView.as_view(), name="cars_list"),
     path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
-    path("basket/", BasketView.as_view(), name="basket"),
-    path("orders_page/", orders_page, name="orders_page"),
+    path("cart/", CartView.as_view(), name="cart"),
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
-    path(
-        "issuance_of_a_license/<int:order_id>/",
-        issuance_of_a_license,
-        name="issuance_of_a_license",
-    ),
     path("sell_cars/", sell_cars, name="sell_cars"),
     path("logout", logout_view, name="logout"),
     path("login/", include("allauth.account.urls"), name="account_login"),
