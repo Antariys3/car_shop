@@ -193,7 +193,6 @@ def delete_order(request, order_id):
     return redirect("cars_list")
 
 
-
 @login_required
 def sell_cars(request):
     if request.method == "GET":
