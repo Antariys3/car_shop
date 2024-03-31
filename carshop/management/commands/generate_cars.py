@@ -3,56 +3,75 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from carshop.models import Car, CarType
 from carshop.images_processing import crop_image
+from carshop.models import Car, CarType
 
 
 class CarsGenerator:
-    def __init__(self, brand, name, price, color, year, image, image_name):
-        self.brand = brand
-        self.name = name
-        self.price = price
-        self.color = color
-        self.year = year
-        self.image = image
-        self.image_name = image_name
+    def __init__(self, car_data):
+        self.brand = car_data.get("brand")
+        self.name = car_data.get("name")
+        self.price = car_data.get("price")
+        self.color = car_data.get("color")
+        self.year = car_data.get("year")
+        self.image = car_data.get("image")
+        self.image_name = car_data.get("image_name")
 
 
-alfa_romeo_image = "carshop/static/database_autocomplete/alfa-romeo-red_2.jpg"
-audi_image = "carshop/static/database_autocomplete/audi A-6_2.jpg"
-bmv_image = "carshop/static/database_autocomplete/BMW_M5_F90.png"
-passat_image = "carshop/static/database_autocomplete/volkswagen-passat_2.jpg"
-mercedes_image = "carshop/static/database_autocomplete/Mercedes_C205.png"
+alfa_romeo_data = {
+    "brand": "Alfa Romeo",
+    "name": "Giulia",
+    "price": 20000,
+    "color": "Red",
+    "year": "2015",
+    "image": "carshop/static/database_autocomplete/alfa-romeo-red_2.jpg",
+    "image_name": "alfa_romeo_red_2.jpg",
+}
+alfa_romeo = CarsGenerator(alfa_romeo_data)
 
-alfa_romeo = CarsGenerator(
-    "Alfa Romeo",
-    "Giulia",
-    20000,
-    "Red",
-    "2015",
-    alfa_romeo_image,
-    "alfa_romeo_red_2.jpg",
-)
-audi = CarsGenerator("AUDI", "A-6", 12000, "Blue", "2012", audi_image, "audi A-6_2.jpg")
-bmv = CarsGenerator("BMV", "M-5", 25000, "Blue", "2022", bmv_image, "BMW_M5_F90.png")
-passat = CarsGenerator(
-    "Volkswagen",
-    "Passat",
-    10000,
-    "metallic",
-    "2010",
-    passat_image,
-    "volkswagen-passat_2.jpg",
-)
-mercedes = CarsGenerator(
-    "Mercedes-Benz",
-    "C205",
-    23000,
-    "white",
-    "2022",
-    mercedes_image,
-    "Mercedes_C205.png",
-)
+audi_data = {
+    "brand": "AUDI",
+    "name": "A-6",
+    "price": 12000,
+    "color": "Blue",
+    "year": "2012",
+    "image": "carshop/static/database_autocomplete/audi A-6_2.jpg",
+    "image_name": "audi A-6_2.jpg",
+}
+audi = CarsGenerator(audi_data)
+
+bmv_data = {
+    "brand": "BMV",
+    "name": "M-5",
+    "price": 25000,
+    "color": "Blue",
+    "year": "2022",
+    "image": "carshop/static/database_autocomplete/BMW_M5_F90.png",
+    "image_name": "BMW_M5_F90.png",
+}
+bmv = CarsGenerator(bmv_data)
+
+passat_data = {
+    "brand": "Volkswagen",
+    "name": "Passat",
+    "price": 10000,
+    "color": "metallic",
+    "year": "2010",
+    "image": "carshop/static/database_autocomplete/volkswagen-passat_2.jpg",
+    "image_name": "volkswagen-passat_2.jpg",
+}
+passat = CarsGenerator(passat_data)
+
+mercedes_data = {
+    "brand": "Mercedes-Benz",
+    "name": "C205",
+    "price": 23000,
+    "color": "white",
+    "year": "2022",
+    "image": "carshop/static/database_autocomplete/Mercedes_C205.png",
+    "image_name": "Mercedes_C205.png",
+}
+mercedes = CarsGenerator(mercedes_data)
 
 
 def generate_cars(self, car_gen):
