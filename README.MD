@@ -1,3 +1,5 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/457bef734fe69de9a7e4/maintainability)](https://codeclimate.com/github/Antariys3/car_shop/maintainability)
+
 1. Install deps:
 ```
 pip install -r requirements.txt
