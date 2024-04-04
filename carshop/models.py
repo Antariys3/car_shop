@@ -33,6 +33,7 @@ class Car(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="cars"
     )
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="cars_sold")
 
     def block(self, order):
         self.blocked_by_order = order
@@ -48,8 +49,12 @@ class Car(models.Model):
         self.owner = self.blocked_by_order.client
         self.save()
 
-    def add_owner(self, client):
-        self.owner = client
+    def add_owner(self, user):
+        self.owner = user
+        self.save()
+
+    def add_seller(self, user):
+        self.seller = user
         self.save()
 
     def remove_owner(self):
@@ -105,6 +110,11 @@ class OrderQuantity(models.Model):
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name="order_quantities"
     )
+
+
+class Seller(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller_profile")
+    car_type = models.ManyToManyField(CarType, related_name="sellers")
 
 
 class CarPhotos(models.Model):

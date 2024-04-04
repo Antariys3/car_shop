@@ -1,15 +1,15 @@
 from datetime import datetime
 
 from allauth.account.forms import SignupForm
-from django.contrib.auth.models import User
 from django import forms
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.forms import ModelForm
 
 from .models import CarType
 
 
-class CreateCarsForm(ModelForm):
+class SellCarsFormView(ModelForm):
     colors = ["white", "black", "metallic", "red", "blue", "green", "yellow"]
 
     color = forms.ChoiceField(

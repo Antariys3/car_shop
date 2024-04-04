@@ -20,7 +20,7 @@ from django.urls import path, include
 
 from carshop.views import (
     delete_order,
-    sell_cars,
+    SellCarView,
     logout_view,
     image_edit,
     CarsShopView,
@@ -38,7 +38,7 @@ urlpatterns = [
     path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
     path("cart/", CartView.as_view(), name="cart"),
     path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
-    path("sell_cars/", sell_cars, name="sell_cars"),
+    path("sell_cars/", SellCarView.as_view(), name="sell_cars"),
     path("logout", logout_view, name="logout"),
     path("login/", include("allauth.account.urls"), name="account_login"),
     path("accounts/", include("allauth.urls")),

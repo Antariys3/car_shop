@@ -12,8 +12,8 @@ from rest_framework.reverse import reverse
 
 from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
-from .forms import CreateCarsForm, CustomSignupForm
-from .models import CarType, OrderQuantity, Car, Licence
+from .forms import SellCarsFormView, CustomSignupForm
+from .models import CarType, OrderQuantity, Car
 from .models import Order
 
 
@@ -114,6 +114,7 @@ class CartView(View):
     template_name = "cart.html"
 
     def get(self, request, *args, **kwargs):
+        print("type Cart", type(request.user))
         order = Order.objects.filter(is_paid=False, client_id=request.user).first()
         if order is None:
             return render(request, self.template_name, {"order": order})
@@ -193,30 +194,34 @@ def delete_order(request, order_id):
     return redirect("cars_list")
 
 
-@login_required
-def sell_cars(request):
-    if request.method == "GET":
-        form = CreateCarsForm()
-        return render(request, "sell_cars.html", {"form": form})
-    form = CreateCarsForm(request.POST, request.FILES)
-    if form.is_valid():
-        brand = form.cleaned_data["brand"]
-        name = form.cleaned_data["name"]
-        price = form.cleaned_data["price"]
-        color = form.cleaned_data["color"]
-        year = form.cleaned_data["year"]
-        image = form.cleaned_data["image"]
+@method_decorator(login_required, name="dispatch")
+class SellCarView(View):
+    template_name = "sell_cars.html"
 
-        try:
-            with transaction.atomic():
-                car_type = CarType.objects.create(brand=brand, name=name, price=price)
-                car_type.image.save(f"{image}", crop_image(image))
-                car = Car(car_type=car_type, color=color, year=year)
-                car.save()
-        except Exception as e:
-            print(f"Ошибка: {e}")
-        return redirect("cars_list")
-    return render(request, "sell_cars.html", {"form": form})
+    def get(self, request):
+        form = SellCarsFormView()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = SellCarsFormView(request.POST, request.FILES)
+        if form.is_valid():
+            brand = form.cleaned_data["brand"]
+            name = form.cleaned_data["name"]
+            price = form.cleaned_data["price"]
+            color = form.cleaned_data["color"]
+            year = form.cleaned_data["year"]
+            image = form.cleaned_data["image"]
+
+            try:
+                with transaction.atomic():
+                    car_type = CarType.objects.create(brand=brand, name=name, price=price)
+                    car_type.image.save(f"{image}", crop_image(image))
+                    car = Car(car_type=car_type, color=color, year=year, seller=request.user)
+                    car.save()
+            except ValueError as e:
+                print(f"Error: {e}")
+            return redirect("cars_list")
+        return render(request, self.template_name, {"form": form})
 
 
 def image_edit(request):
