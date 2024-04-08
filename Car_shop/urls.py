@@ -19,10 +19,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 from carshop.views import (
-    delete_order,
     SellCarView,
     logout_view,
-    image_edit,
     CarsShopView,
     CarDetailView,
     CartView,
@@ -57,7 +55,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("accounts/", include("allauth.socialaccount.urls")),
     path("signup/", CustomSignupView.as_view(), name="custom_signup"),
-    path("image_edit/", image_edit, name="image_edit"),
     path("payment_status/", PaymentStatusView.as_view(), name="payment_status"),
     path(
         "payment_status_details/<int:order_id>/",

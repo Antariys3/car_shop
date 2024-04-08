@@ -2,14 +2,14 @@ from allauth.account.views import SignupView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.utils.decorators import method_decorator
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.edit import UpdateView, DeleteView
 from rest_framework.reverse import reverse
 
@@ -186,15 +186,16 @@ class PaymentStatusDetailsView(TemplateView):
         )
 
 
-def delete_order(request, order_id):
-    cars = Car.objects.filter(blocked_by_order=order_id)
-    for car in cars:
-        car.unblock()
-        car.remove_owner()
-    order = get_object_or_404(Order, id=order_id)
-    order.delete()
-
-    return redirect("cars_list")
+class DeleteOrderView(DetailView):
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs.get("order_id")
+        cars = Car.objects.filter(blocked_by_order=order_id)
+        for car in cars:
+            car.unblock()
+            car.remove_owner()
+        order = get_object_or_404(Order, id=order_id)
+        order.delete()
+        return redirect("cars_list")
 
 
 @method_decorator(login_required, name="dispatch")
