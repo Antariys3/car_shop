@@ -186,6 +186,7 @@ class PaymentStatusDetailsView(TemplateView):
         )
 
 
+@method_decorator(login_required, name="dispatch")
 class DeleteOrderView(DetailView):
     def post(self, request, *args, **kwargs):
         order_id = self.kwargs.get("order_id")
