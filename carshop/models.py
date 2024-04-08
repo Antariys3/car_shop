@@ -33,7 +33,9 @@ class Car(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="cars"
     )
-    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="cars_sold")
+    seller = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="cars_sold"
+    )
 
     def block(self, order):
         self.blocked_by_order = order
@@ -113,7 +115,9 @@ class OrderQuantity(models.Model):
 
 
 class Seller(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="seller_profile")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="seller_profile"
+    )
     car_type = models.ManyToManyField(CarType, related_name="sellers")
 
 

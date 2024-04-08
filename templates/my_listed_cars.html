@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}My Cars for Sale{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>My Cars for Sale</h2>
+        <div class="card">
+            <div class="card-body">
+                {% if list_cars_sell %}
+                    <ul>
+                        {% for car in list_cars_sell %}
+                            <li>
+                                <strong>Brand:</strong> {{ car.car_type.brand }}<br>
+                                <strong>Name:</strong> {{ car.car_type.name }}<br>
+                                <strong>Price:</strong> {{ car.car_type.price }}<br>
+                                {% if car.car_type.image %}
+                                    <a href="{% url 'sell_car_update' car.pk %}">
+                                        <img src="{{ car.car_type.image.url }}" alt="Car Image" width="100">
+                                    </a><br>
+                                {% endif %}
+                                <a href="{% url 'sell_car_update' car.pk %}" class="btn btn-primary">Edit</a>
+                                <a href="{% url 'sell_car_delete' car.pk %}" class="btn btn-danger">Delete</a>
+                                <hr>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>You haven't listed any cars for sale yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

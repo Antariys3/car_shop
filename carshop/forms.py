@@ -48,7 +48,7 @@ class SellCarsFormView(ModelForm):
 
     def clean_image(self):
         image = self.cleaned_data.get("image")
-        if not image:
+        if self.instance.pk is None and not image:
             raise forms.ValidationError("Car photo is not selected")
         return image
 
