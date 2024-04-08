@@ -1,20 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Sell a Car{% endblock %}
+{% block title %}Edit Car{% endblock %}
 
 {% block content %}
     {% load bootstrap5 %}
 
     <div class="container custom-container">
-        <h4>List a Car for Sale</h4>
-        <h6>Please fill in all fields</h6>
+        <h4>Edit Car</h4>
         <div class="row justify-content-start">
             <div class="col-md-auto">
-                <form method="post" enctype="multipart/form-data" action="{% url 'sell_cars' %}" class="mb-3">
+                {% if image_url %}
+                    <img src="{{ image_url }}" alt="Car Image" class="img-thumbnail" style="max-width: 450px;">
+                    <br>
+                {% endif %}
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% bootstrap_form form %}
                     {% buttons %}
-                        <button type="submit" class="btn btn-primary">List for Sale</button>
+                        <button type="submit" class="btn btn-primary">Update Listing</button>
                     {% endbuttons %}
                 </form>
                 {% if result %}

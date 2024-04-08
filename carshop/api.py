@@ -71,7 +71,7 @@ class AddToCartAPIView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request, car_id, *args, **kwargs):
-        # adding a car to basket
+        # adding a car to cart
         client = User.objects.filter(username=request.user).first()
         order, created = Order.objects.get_or_create(client=client, is_paid=False)
         order_serializer = OrderSerializer(data=client)

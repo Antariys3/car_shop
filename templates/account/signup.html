@@ -13,10 +13,12 @@
                             {% element h1 %}
                                 {% trans "Sign Up" %}
                             {% endelement %}
-                            <p>
-                                {% blocktrans %}У вас уже есть аккаунт? Тогда пожалуйста
-                                    <a href="{{ login_url }}">Войдите</a>{% endblocktrans %}
-                            </p>
+                                <p>
+                                    {% blocktrans %}
+                                        Do you already have an account? If so, please
+                                        <a href="{{ login_url }}">Log In</a>
+                                    {% endblocktrans %}
+                                </p>
                             {% url 'account_signup' as action_url %}
                         </div>
                         <div class="card-body">
@@ -30,7 +32,7 @@
                                 {% endfor %}
                                 {% endslot %}
                                 {% slot actions %}
-                                    <button type="submit" class="col-md-12 btn btn-dark">Зарегистрироваться</button>
+                                    <button type="submit" class="col-md-12 btn btn-dark">{% trans "Sign Up" %}</button>
                                 {% endslot %}
                                 {% endelement %}
                             {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}

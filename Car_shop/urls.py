@@ -19,18 +19,18 @@ from django.contrib import admin
 from django.urls import path, include
 
 from carshop.views import (
-    orders_page,
-    delete_order,
-    issuance_of_a_license,
-    sell_cars,
+    SellCarView,
     logout_view,
-    image_edit,
     CarsShopView,
     CarDetailView,
-    BasketView,
+    CartView,
     PaymentStatusView,
     PaymentStatusDetailsView,
     CustomSignupView,
+    MyListedCarsView,
+    SellCarUpdateView,
+    SellCarDeleteView,
+    DeleteOrderView,
 )
 
 urlpatterns = [
@@ -38,21 +38,23 @@ urlpatterns = [
     path("api/", include("carshop.urls")),
     path("", CarsShopView.as_view(), name="cars_list"),
     path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
-    path("basket/", BasketView.as_view(), name="basket"),
-    path("orders_page/", orders_page, name="orders_page"),
-    path("order/<int:order_id>/delete/", delete_order, name="delete_order"),
+    path("cart/", CartView.as_view(), name="cart"),
     path(
-        "issuance_of_a_license/<int:order_id>/",
-        issuance_of_a_license,
-        name="issuance_of_a_license",
+        "order/<int:order_id>/delete/", DeleteOrderView.as_view(), name="delete_order"
     ),
-    path("sell_cars/", sell_cars, name="sell_cars"),
+    path("sell_cars/", SellCarView.as_view(), name="sell_cars"),
+    path("my_listed_cars/", MyListedCarsView.as_view(), name="my_listed_cars"),
+    path(
+        "sell_car_update/<int:pk>/", SellCarUpdateView.as_view(), name="sell_car_update"
+    ),
+    path(
+        "sell_car_delete/<int:pk>/", SellCarDeleteView.as_view(), name="sell_car_delete"
+    ),
     path("logout", logout_view, name="logout"),
     path("login/", include("allauth.account.urls"), name="account_login"),
     path("accounts/", include("allauth.urls")),
     path("accounts/", include("allauth.socialaccount.urls")),
     path("signup/", CustomSignupView.as_view(), name="custom_signup"),
-    path("image_edit/", image_edit, name="image_edit"),
     path("payment_status/", PaymentStatusView.as_view(), name="payment_status"),
     path(
         "payment_status_details/<int:order_id>/",

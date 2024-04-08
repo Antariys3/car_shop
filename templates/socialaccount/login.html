@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load allauth %}
 {% block head_title %}
-    {% trans "Войти" %}
+    {% trans "Log In" %}
 {% endblock head_title %}
 {% block content %}
     <div class="container">
@@ -11,19 +11,19 @@
                 <div class="card shadow-lg border-0 rounded-lg mt-0 mb-3">
                     <div class="card-header justify-content-center">
                         {% if process == "connect" %}
-                            <h1>{% blocktrans with provider.name as provider %}Подключить
+                            <h1>{% blocktrans with provider.name as provider %}Connect to
                                 {{ provider }}{% endblocktrans %}</h1>
-                            <p>{% blocktrans with provider.name as provider %}Вы собираетесь подключить новый аккаунт от
+                            <p>{% blocktrans with provider.name as provider %}You are about to connect a new account from
                                 {{ provider }}.{% endblocktrans %}</p>
                         {% else %}
-                            <h1>{% blocktrans with provider.name as provider %}Войти через
+                            <h1>{% blocktrans with provider.name as provider %}Log in via
                                 {{ provider }}{% endblocktrans %}</h1>
-                            <p>{% blocktrans with provider.name as provider %}Вы собираетесь войти, используя аккаунт от
+                            <p>{% blocktrans with provider.name as provider %}You are about to log in using an account from
                                 {{ provider }}.{% endblocktrans %}</p>
                         {% endif %}
                         <form method="post" class="text-center">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-dark">{% trans "Продолжить" %}</button>
+                            <button type="submit" class="btn btn-dark">{% trans "Continue" %}</button>
                         </form>
                     </div>
                 </div>

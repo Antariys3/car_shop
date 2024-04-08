@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 {% load bootstrap5 %}
 <head>
     <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet"/>
@@ -24,9 +24,9 @@
      <div class="container">
          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
              <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                 <li><a href="{% url 'cars_list' %}" class="nav-link px-2 text-white">Магазин</a></li>
-                 <li><a href="{% url 'sell_cars' %}" class="nav-link px-2 text-white">Продать машину</a></li>
-                 <li><a href="{% url 'image_edit' %}" class="nav-link px-2 text-white">Изменить фото</a></li>
+                 <li><a href="{% url 'cars_list' %}" class="nav-link px-2 text-white">Shop</a></li>
+                 <li><a href="{% url 'sell_cars' %}" class="nav-link px-2 text-white">Sell a Car</a></li>
+                 <li><a href="{% url 'my_listed_cars' %}" class="nav-link px-2 text-white">My Listings</a></li>
              </ul>
              <div class="text-end">
                  {% if request.user.is_authenticated %}
@@ -35,10 +35,10 @@
                      {% else %}
                          {{ user.username }} &nbsp; &nbsp;
                      {% endif %}
-                     <a href="{% url 'payment_status' %}" class="btn btn-success">Мои покупки</a>
+                     <a href="{% url 'payment_status' %}" class="btn btn-success">My Purchases</a>
                      <span class="position-relative me-3">
-                        <a href="{% url 'basket' %}" class="btn btn-success">
-                            Корзина
+                        <a href="{% url 'cart' %}" class="btn btn-success">
+                            Cart
                             {% if cart_items_count > 0 %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     {{ cart_items_count }}
@@ -46,9 +46,9 @@
                             {% endif %}
                     </a>
                     </span>
-                     <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
+                     <a href="{% url 'logout' %}" class="btn btn-warning">Log Out</a>
                  {% else %}
-                     <a href="{% url 'account_login' %}" class="btn btn-info">Войти</a>
+                     <a href="{% url 'account_login' %}" class="btn btn-info">Log In</a>
                  {% endif %}
              </div>
          </div>

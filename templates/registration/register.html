@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Регистрация{% endblock %}
+{% block title %}Registration{% endblock %}
 {% load static %}
 
 {% block content %}
@@ -10,7 +10,7 @@
                     <div class="card shadow-lg border-0 rounded-lg mt-0 mb-3">
                         <div class="card-header justify-content-center">
                             <div id="error_div"></div>
-                            <h3 class="font-weight-light my-4 text-center">Регистрация пользователя</h3>
+                            <h3 class="font-weight-light my-4 text-center">{% trans "User Registration" %}</h3>
                         </div>
                         <div class="card-body">
                             <form method="post">
@@ -20,7 +20,8 @@
                                               for="{{ f.id_for_label }}">{{ f.label }}: </label>{{ f }}</p>
                                     <div class="form-error">{{ f.errors }}</div>
                                 {% endfor %}
-                                <button type="submit" class="col-md-12 btn btn-dark">Зарегистрироваться</button>
+                                <button type="submit" class="col-md-12 btn btn-dark">{% trans "Register" %}</button>
+
                             </form>
                         </div>
                     </div>

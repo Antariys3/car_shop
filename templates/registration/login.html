@@ -8,7 +8,7 @@
                     <div class="card shadow-lg border-0 rounded-lg mt-0 mb-3">
                         <div class="card-header justify-content-center">
                             <div id="error_div"></div>
-                            <h3 class="font-weight-light my-4 text-center">Авторизация</h3>
+                                <h3 class="font-weight-light my-4 text-center">{% trans "Authorization" %}</h3>
                         </div>
                             {% if form.errors %}
                                 <p>Your username and password didn't match. Please try again.</p>
@@ -29,12 +29,12 @@
                                 <p><label class="form-label">{{ form.password.label_tag }} </label>{{ form.password }}</p>
 
 
-                                <button type="submit" class="col-md-12 btn btn-dark">Войти</button>
+                                <button type="submit" class="col-md-12 btn btn-dark">{% trans "Log In" %}</button>
                                 <input type="hidden" name="next" value="{{ next }}">
                             </form>
 
 
-                            <p><a href="{% url 'password_reset' %}">Забыли пароль?</a></p>
+                            <p><a href="{% url 'password_reset' %}">{% trans "Forgot Password?" %}</a></p>
                         </div>
                     </div>
                 </div>

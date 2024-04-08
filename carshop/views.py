@@ -2,18 +2,21 @@ from allauth.account.views import SignupView
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic.edit import UpdateView, DeleteView
 from rest_framework.reverse import reverse
 
 from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
-from .forms import CreateCarsForm, CustomSignupForm
-from .models import CarType, OrderQuantity, Car, Licence
+from .forms import SellCarsFormView, CustomSignupForm
+from .models import CarType, OrderQuantity, Car
 from .models import Order
 
 
@@ -106,14 +109,15 @@ class CarDetailView(View):
 
             car.block(order)
             car.add_owner(client)
-        return redirect("basket")
+        return redirect("cart")
 
 
 @method_decorator(login_required, name="dispatch")
-class BasketView(View):
-    template_name = "basket.html"
+class CartView(View):
+    template_name = "cart.html"
 
     def get(self, request, *args, **kwargs):
+        print("type Cart", type(request.user))
         order = Order.objects.filter(is_paid=False, client_id=request.user).first()
         if order is None:
             return render(request, self.template_name, {"order": order})
@@ -133,7 +137,6 @@ class BasketView(View):
         cars = Car.objects.filter(
             blocked_by_order=order, owner=request.user
         ).select_related("car_type")
-        # webhook_url = create_invoice(order, cars, "https://webhook.site/b77edef1-6a93-4fa6-8dff-ae65350eb84c")
         create_invoice(order, cars, reverse("webhook-mono", request=request))
         return redirect(order.invoice_url)
 
@@ -183,89 +186,125 @@ class PaymentStatusDetailsView(TemplateView):
         )
 
 
-def orders_page(request):
-    list_orders = Order.objects.filter(is_paid=False)
-    return render(request, "orders_page.html", {"list_orders": list_orders})
+@method_decorator(login_required, name="dispatch")
+class DeleteOrderView(DetailView):
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs.get("order_id")
+        cars = Car.objects.filter(blocked_by_order=order_id)
+        for car in cars:
+            car.unblock()
+            car.remove_owner()
+        order = get_object_or_404(Order, id=order_id)
+        order.delete()
+        return redirect("cars_list")
 
 
-def delete_order(request, order_id):
-    cars = Car.objects.filter(blocked_by_order=order_id)
-    for car in cars:
-        car.unblock()
-        car.remove_owner()
-    order = get_object_or_404(Order, id=order_id)
-    order.delete()
+@method_decorator(login_required, name="dispatch")
+class SellCarView(View):
+    template_name = "sell_cars.html"
 
-    return redirect("cars_list")
+    def get(self, request):
+        form = SellCarsFormView()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = SellCarsFormView(request.POST, request.FILES)
+        if form.is_valid():
+            brand = form.cleaned_data["brand"]
+            name = form.cleaned_data["name"]
+            price = form.cleaned_data["price"]
+            color = form.cleaned_data["color"]
+            year = form.cleaned_data["year"]
+            image = form.cleaned_data["image"]
+
+            try:
+                with transaction.atomic():
+                    car_type = CarType.objects.create(
+                        brand=brand, name=name, price=price
+                    )
+                    car_type.image.save(f"{image}", crop_image(image))
+                    car = Car(
+                        car_type=car_type, color=color, year=year, seller=request.user
+                    )
+                    car.save()
+            except ValidationError as e:
+                print(f"ValidationError: {e}")
+            return redirect("cars_list")
+        return render(request, self.template_name, {"form": form})
 
 
-def issuance_of_a_license(request, order_id):
-    licenses = Licence.objects.filter(order_id=order_id)
-    return render(
-        request,
-        "issuance_of_a_license.html",
-        {"licenses": licenses, "order_id": order_id},
-    )
+@method_decorator(login_required, name="dispatch")
+class MyListedCarsView(ListView):
+    model = Car
+    template_name = "my_listed_cars.html"
+    success_url = reverse_lazy("cars_list")
+
+    def get(self, request, *args, **kwargs):
+        list_cars_sell = Car.objects.filter(
+            blocked_by_order=None, seller=request.user
+        ).select_related("car_type")
+        return render(request, self.template_name, {"list_cars_sell": list_cars_sell})
 
 
-@login_required
-def sell_cars(request):
-    if request.method == "GET":
-        form = CreateCarsForm()
-        return render(request, "sell_cars.html", {"form": form})
-    form = CreateCarsForm(request.POST, request.FILES)
-    if form.is_valid():
-        brand = form.cleaned_data["brand"]
-        name = form.cleaned_data["name"]
-        price = form.cleaned_data["price"]
-        color = form.cleaned_data["color"]
-        year = form.cleaned_data["year"]
-        image = form.cleaned_data["image"]
+@method_decorator(login_required, name="dispatch")
+class SellCarUpdateView(UpdateView):
+    model = Car
+    form_class = SellCarsFormView
+    template_name = "sell_car_update.html"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("car_type")
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Car, pk=self.kwargs["pk"], seller=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        car = self.get_object()
+        initial_data = {
+            "brand": car.car_type.brand,
+            "name": car.car_type.name,
+            "price": car.car_type.price,
+            "image": car.car_type.image,
+            "color": car.color,
+            "year": car.year,
+        }
+
+        form = self.form_class(initial=initial_data)
+        context["image_url"] = car.car_type.image.url if car.car_type.image else None
+        context["form"] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        car_instance = self.get_object()
+        car_type_instance = car_instance.car_type
+
+        car_instance.color = request.POST.get("color")
+        car_instance.year = request.POST.get("year")
+        car_type_instance.brand = request.POST.get("brand")
+        car_type_instance.name = request.POST.get("name")
+        car_type_instance.price = request.POST.get("price")
+        image = request.FILES.get("image")
+        if image:
+            car_type_instance.image.save(image.name, crop_image(image))
 
         try:
             with transaction.atomic():
-                car_type = CarType.objects.create(brand=brand, name=name, price=price)
-                car_type.image.save(f"{image}", crop_image(image))
-                car = Car(car_type=car_type, color=color, year=year)
-                car.save()
-        except Exception as e:
-            print(f"Ошибка: {e}")
+                car_instance.save()
+                car_type_instance.save()
+        except ValidationError as e:
+            print(f"ValidationError: {e}")
         return redirect("cars_list")
-    return render(request, "sell_cars.html", {"form": form})
 
 
-def image_edit(request):
-    cars = Car.objects.filter(blocked_by_order=None, owner=None).prefetch_related(
-        "car_type"
-    )
-    car_types = (
-        CarType.objects.filter(id__in=cars.values_list("car_type__id", flat=True))
-        .values("brand", "name", "image")
-        .distinct()
-    )
-    for car in car_types:
-        car["car_type"] = CarType.objects.filter(
-            brand=car["brand"], name=car["name"], image=car["image"]
-        ).first()
+@method_decorator(login_required, name="dispatch")
+class SellCarDeleteView(DeleteView):
+    model = Car
+    template_name = "sell_car_delete.html"
+    success_url = reverse_lazy("cars_list")
 
-    if request.method == "GET":
-        return render(request, "image_edit.html", {"car_types": car_types})
-
-    if request.method == "POST":
-        for car in car_types:
-            car_type_id = request.POST.get(f'car_type_id_{car["car_type"].id}')
-            image_file = request.FILES.get(f'image_{car["car_type"].id}')
-
-            if car_type_id and image_file:
-                car_type = CarType.objects.get(id=car_type_id)
-                car_types = CarType.objects.filter(
-                    name=car_type.name, image=car_type.image
-                )
-                for car_type in car_types:
-                    car_type.image.delete()
-                    car_type.image.save(f"{image_file}", crop_image(image_file))
-
-        return redirect("cars_list")
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 
 class CustomSignupView(SignupView):

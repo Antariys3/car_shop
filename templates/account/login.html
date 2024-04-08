@@ -14,7 +14,7 @@
                     <div class="card shadow-lg border-0 rounded-lg mt-0 mb-3">
                         <div class="card-header justify-content-center">
                             <div id="error_div"></div>
-                            <h3 class="font-weight-light my-4 text-center">{% trans "Вход" %}</h3>
+                            <h3 class="font-weight-light my-4 text-center">{% trans "Login" %}</h3>
                         </div>
                         {% if form.errors %}
                             <p>{% trans "Your username and password didn't match. Please try again." %}</p>
@@ -34,15 +34,15 @@
                                 {% if redirect_field_value %}
                                     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
                                 {% endif %}
-                                <button type="submit" class="col-md-12 btn btn-dark">{% trans "Войти" %}</button>
+                                <button type="submit" class="col-md-12 btn btn-dark">{% trans "Log In" %}</button>
                             </form>
                             <hr>
-                            <p>{% trans "Если у вас еще нет учетной записи, пожалуйста," %}
-                                <a href="{{ signup_url }}" class="col-md-12 btn btn-info">{% trans "Зарегистрируйтесь" %}</a>
+                            <p>{% trans "If you don't have an account, please," %}
+                                <a href="{{ signup_url }}" class="col-md-12 btn btn-info">{% trans "Sign Up" %}</a>
                             </p>
                         
                             <a href="{% provider_login_url 'google' %}" class="col-md-12 btn btn-success">
-                                {% trans "Вход через Google" %}
+                                {% trans "Login with Google" %}
                             </a>
                             
                         </div>
@@ -52,3 +52,4 @@
         </div>
     </div>
 {% endblock content %}
+

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Список машин{% endblock %}
+{% block title %}Cars list{% endblock %}
 
 
 {% block content %}
@@ -10,7 +10,7 @@
     <div class="sections mt-3">
         <div class="container">
             {% if cars %}
-                <h4 class="text-center">Выберете машины для заказа</h4>
+                <h4 class="text-center">Select cars for the order</h4>
                 <div class="row">
                     {% for car in cars %}
                         <div class="col-lg-4">
@@ -24,14 +24,14 @@
                                     </a>
                                 </div>
                                 <h5> {{ car.car_type.brand }} {{ car.car_type.name }}</h5>
-                                <p class="mb-2">Год {{ car.year }}</p>
-                                <p class="mb-2">Цена: {{ car.car_type.price }}</p>
+                                <p class="mb-2">Year {{ car.year }}</p>
+                                <p class="mb-2">Price: {{ car.car_type.price }}</p>
 
                                 <div class="add-to-cart-btn">
                                     <form method="post" action="{% url 'cars_list' %}">
                                         {% csrf_token %}
                                         <input type="hidden" name="car_id" value="{{ car.id }}">
-                                        <button type="submit" class="btn btn-dark text-white">Добавить в корзину
+                                        <button type="submit" class="btn btn-dark text-white">Add to cart
                                         </button>
                                     </form>
                                 </div>
@@ -41,7 +41,7 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <h4 class="text-center">БД пустая, добавьте машины</h4>
+                <h4 class="text-center">The database is empty, please add cars</h4>
             {% endif %}
         </div>
     </div>
