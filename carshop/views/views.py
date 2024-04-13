@@ -1,27 +1,29 @@
 from allauth.account.views import SignupView
-# TODO above lib is not in requirements
-
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView, ListView, DetailView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import DeleteView, UpdateView
 from rest_framework.reverse import reverse
 # TODO above lib is not in requirements
-
 from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
-from ..forms import SellCarsFormView, CustomSignupForm
-from ..models import CarType, OrderQuantity, Car
-from ..models import Order
-from .utils import order_saver, cars_counter, img_finder, reset_car
+
+from ..forms import CustomSignupForm, SellCarsFormView
+from ..models import Car, CarType, Order, OrderQuantity
+from .utils import cars_counter, img_finder, order_saver, reset_car
+
+
+# TODO make below view class based
+def logout_view(request):
+    logout(request)
+    return redirect("cars_list")
 
 
 class CarsShopView(ListView):
@@ -115,11 +117,9 @@ class CartView(View):
         order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
         cars = Car.objects.filter(
-            blocked_by_order=order,
-            owner=request.user
+            blocked_by_order=order, owner=request.user
         ).select_related("car_type")
-        create_invoice(order, cars,
-                       reverse("webhook-mono", request=request))
+        create_invoice(order, cars, reverse("webhook-mono", request=request))
         return redirect(order.invoice_url)
 
 
@@ -162,8 +162,7 @@ class PaymentStatusDetailsView(TemplateView):
         return render(
             request,
             self.template_name,
-            {"cars_in_order": cars_in_order,
-             "order": order_quantities},
+            {"cars_in_order": cars_in_order, "order": order_quantities},
         )
 
 
