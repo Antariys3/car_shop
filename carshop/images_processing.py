@@ -1,8 +1,9 @@
 from io import BytesIO
 
+from django.core.files.base import ContentFile
+
 # TODO below lib is not in requirements
 from PIL import Image
-from django.core.files.base import ContentFile
 
 from carshop.constants import ASPECT_RATIO
 

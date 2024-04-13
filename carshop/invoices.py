@@ -7,7 +7,7 @@ import ecdsa
 import requests
 from django.conf import settings
 
-from carshop.constants import REDIRECT_URL, PUBLIC_KEY
+from carshop.constants import PUBLIC_KEY, REDIRECT_URL
 from carshop.models import Order
 
 

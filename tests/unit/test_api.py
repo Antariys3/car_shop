@@ -1,10 +1,10 @@
+import json
+
+import responses
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework.test import APITransactionTestCase
-import json
-import responses
+from rest_framework.test import APITestCase, APITransactionTestCase
 
 
 class CustomObtainAuthTokenTest(APITestCase):

@@ -1,14 +1,14 @@
 from django.contrib import admin
 
 from .models import (
-    Client,
-    CarType,
     Car,
+    CarType,
+    Client,
     Dealership,
     Licence,
+    MonoSettings,
     Order,
     OrderQuantity,
-    MonoSettings,
 )
 
 admin.site.register(Client)
