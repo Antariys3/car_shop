@@ -61,7 +61,8 @@ class CustomSignupForm(SignupForm):
         label="Email", widget=forms.EmailInput(attrs={"class": "form-input"})
     )
     password1 = forms.CharField(
-        label="Password", widget=forms.PasswordInput(attrs={"class": "form-input"})
+        label="Password",
+        widget=forms.PasswordInput(attrs={"class": "form-input"}),
     )
     password2 = forms.CharField(
         label="Confirm Password",

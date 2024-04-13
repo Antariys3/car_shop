@@ -46,14 +46,15 @@ class CustomObtainAuthToken(ObtainAuthToken):
         else:
             # User exists, but password is incorrect
             return Response(
-                {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+                {"error": "Invalid credentials"},
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
 
 class CarsAPIView(viewsets.ModelViewSet):
-    queryset = Car.objects.filter(blocked_by_order=None, owner=None).select_related(
-        "car_type"
-    )
+    queryset = Car.objects.filter(
+        blocked_by_order=None, owner=None
+    ).select_related("car_type")
     serializer_class = CarSerializer
     http_method_names = ["get"]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -73,7 +74,9 @@ class AddToCartAPIView(APIView):
     def post(self, request, car_id, *args, **kwargs):
         # adding a car to cart
         client = User.objects.filter(username=request.user).first()
-        order, created = Order.objects.get_or_create(client=client, is_paid=False)
+        order, created = Order.objects.get_or_create(
+            client=client, is_paid=False
+        )
         order_serializer = OrderSerializer(data=client)
         if order_serializer.is_valid():
             order_serializer.save()
@@ -89,7 +92,9 @@ class AddToCartAPIView(APIView):
         car.block(order)
         car.add_owner(client)
 
-        OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
+        OrderQuantity.objects.create(
+            car_type=car.car_type, quantity=1, order=order
+        )
         car_serializer = CarSerializer(car)
         return Response(car_serializer.data, status=status.HTTP_200_OK)
 
@@ -106,7 +111,9 @@ class CartAPIView(APIView):
                 {"error": f"User {owner} has an empty cart"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        cars = Car.objects.filter(blocked_by_order=order).select_related("car_type")
+        cars = Car.objects.filter(blocked_by_order=order).select_related(
+            "car_type"
+        )
         total_price = sum(car.car_type.price for car in cars)
         context = {
             "order": OrderSerializer(order).data,
@@ -124,9 +131,9 @@ class CartAPIView(APIView):
             is_paid=False,
         )
 
-        cars = Car.objects.filter(blocked_by_order=order, owner=client).select_related(
-            "car_type"
-        )
+        cars = Car.objects.filter(
+            blocked_by_order=order, owner=client
+        ).select_related("car_type")
 
         create_invoice(order, cars, reverse("webhook-mono", request=request))
 
@@ -138,7 +145,9 @@ class CartAPIView(APIView):
         order = Order.objects.filter(is_paid=False, client_id=owner).first()
 
         if order is None:
-            return Response({"error": "cart empty"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "cart empty"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         pk = kwargs.get("pk", None)
         if pk is None:
@@ -154,17 +163,22 @@ class CartAPIView(APIView):
                 status=status.HTTP_200_OK,
             )
         # removing one car from the cart
-        car_in_order = get_object_or_404(OrderQuantity, order_id=order, car_type_id=pk)
+        car_in_order = get_object_or_404(
+            OrderQuantity, order_id=order, car_type_id=pk
+        )
         if not car_in_order:
             return Response(
-                {"error": "Method DELETE not allowed"}, status=status.HTTP_404_NOT_FOUND
+                {"error": "Method DELETE not allowed"},
+                status=status.HTTP_404_NOT_FOUND,
             )
         car_in_order.delete()
         car = Car.objects.get(blocked_by_order=order.id, car_type_id=pk)
         car.unblock()
         car.remove_owner()
         return Response(
-            {"massage": "The car from the basket has been successfully removed."},
+            {
+                "massage": "The car from the basket has been successfully removed."
+            },
             status=status.HTTP_200_OK,
         )
 

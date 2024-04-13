@@ -187,7 +187,8 @@ class Migration(migrations.Migration):
             model_name="car",
             name="car_type",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="carshop.cartype"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="carshop.cartype",
             ),
         ),
         migrations.AddField(
