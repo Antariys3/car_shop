@@ -2,15 +2,13 @@ import base64
 import hashlib
 
 import ecdsa
+
+# TODO above library is not in requirements.
 import requests
 from django.conf import settings
 
+from carshop.constants import PUBLIC_KEY, REDIRECT_URL
 from carshop.models import Order
-
-PUBLIC_KEY = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFc05mWXpNR1hIM2VXVHkzWnFuVzVrM3luVG5CYgpnc3pXWnhkOStObEtveDUzbUZEVTJONmU0RlBaWmsvQmhqamgwdTljZjVFL3JQaU1EQnJpajJFR1h3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
-REDIRECT_URL = (
-    "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/"
-)
 
 
 def verify_signature(request):
@@ -33,20 +31,13 @@ def verify_signature(request):
 
 
 def create_invoice(order: Order, cars, webhook_url):
-    amount = 0
-    basket_order = []
-    for car in cars:
-        sum_ = car.car_type.price * 100
-        amount += sum_
-        basket_order.append(
-            {
-                "name": f"{car.car_type.brand} {car.car_type.name}",
-                "qty": 1,
-                "sum": sum_,
-                "icon": car.car_type.image.url,
-                "unit": "шт.",
-            }
-        )
+    amount, basket_order = basket_generator(cars)
+    r = payment_request(amount, basket_order, order, webhook_url)
+    r.raise_for_status()
+    creating_order(order, r)
+
+
+def payment_request(amount, basket_order, order, webhook_url):
     merchants_info = {
         "reference": str(order.id),
         "destination": "Купівля машин",
@@ -64,7 +55,28 @@ def create_invoice(order: Order, cars, webhook_url):
         json=request_body,
         headers=headers,
     )
-    r.raise_for_status()
+    return r
+
+
+def basket_generator(cars):
+    amount = 0
+    basket_order = []
+    for car in cars:
+        sum_ = car.car_type.price * 100
+        amount += sum_
+        basket_order.append(
+            {
+                "name": f"{car.car_type.brand} {car.car_type.name}",
+                "qty": 1,
+                "sum": sum_,
+                "icon": car.car_type.image.url,
+                "unit": "шт.",
+            }
+        )
+    return amount, basket_order
+
+
+def creating_order(order, r):
     order.invoice_id = r.json()["invoiceId"]
     order.invoice_url = r.json()["pageUrl"]
     order.status = "created"

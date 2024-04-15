@@ -87,7 +87,9 @@ def generate_cars(self, car_gen):
                     car_type.image.save(
                         car_gen.image_name, crop_image(File(image_file))
                     )
-                car = Car(car_type=car_type, color=car_gen.color, year=car_gen.year)
+                car = Car(
+                    car_type=car_type, color=car_gen.color, year=car_gen.year
+                )
                 car.save()
                 self.stdout.write(
                     self.style.SUCCESS(
@@ -99,7 +101,9 @@ def generate_cars(self, car_gen):
 
 
 class Command(BaseCommand):
-    help = "Generation of adding four types of cars, three each, to the database."
+    help = (
+        "Generation of adding four types of cars, three each, to the database."
+    )
 
     def handle(self, *args, **options):
         generate_cars(self, bmv)

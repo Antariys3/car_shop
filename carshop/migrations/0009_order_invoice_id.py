@@ -5,7 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("carshop", "0008_alter_car_options_order_invoice_url_order_status_and_more"),
+        (
+            "carshop",
+            "0008_alter_car_options_order_invoice_url_order_status_and_more",
+        ),
     ]
 
     operations = [

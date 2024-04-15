@@ -1,11 +1,13 @@
+import re
+
 import pytest
-from rest_framework.test import APIClient
+import requests
 from django.contrib.auth.models import User
 from django.urls import reverse
-from carshop.models import Car, Order
 from rest_framework import status
-import requests
-import re
+from rest_framework.test import APIClient
+
+from carshop.models import Car, Order
 
 SERVER_URL = "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/api/"
 
@@ -44,5 +46,7 @@ def test_get_api_car_by_id():
     assert expected_response["car_type"]["image"].match(
         response.json()["car_type"]["image"]
     )
-    expected_response["car_type"]["image"] = response.json()["car_type"]["image"]
+    expected_response["car_type"]["image"] = response.json()["car_type"][
+        "image"
+    ]
     assert response.json() == expected_response

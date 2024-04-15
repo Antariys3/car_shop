@@ -1,10 +1,10 @@
+import json
+
+import responses
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework.test import APITransactionTestCase
-import json
-import responses
+from rest_framework.test import APITestCase, APITransactionTestCase
 
 
 class CustomObtainAuthTokenTest(APITestCase):
@@ -19,11 +19,15 @@ class CustomObtainAuthTokenTest(APITestCase):
         response = self.client.post(url, data, format="json")
         assert response.status_code == status.HTTP_200_OK
         assert "token" in response.json()
-        assert response.json()["token"] != ""  # Check that the token is not empty
+        assert (
+            response.json()["token"] != ""
+        )  # Check that the token is not empty
 
     def setUp(self):
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", email="test@example.com"
+            username="testuser",
+            password="testpassword",
+            email="test@example.com",
         )
         # self.token = Token.objects.create(user=self.user)
 
@@ -87,7 +91,9 @@ class TestBasketApi(APITransactionTestCase):
     fixtures = ["test_cars"]
 
     def test_add_cars_to_basket(self):
-        user = User.objects.create_user(username="testuser", password="testpassword")
+        user = User.objects.create_user(
+            username="testuser", password="testpassword"
+        )
         self.client.force_authenticate(user)
 
         response = self.client.post("/api/add_to_cart/1/")
@@ -107,7 +113,9 @@ class TestBasketApi(APITransactionTestCase):
 
     def test_views_basket(self):
         user = User.objects.create_user(
-            username="testuser", password="testpassword", email="antar33@gmail.com"
+            username="testuser",
+            password="testpassword",
+            email="antar33@gmail.com",
         )
         self.client.force_authenticate(user)
         self.assertTrue(user.is_authenticated)
@@ -149,14 +157,19 @@ class TestBasketApi(APITransactionTestCase):
     @responses.activate
     def test_creating_a_payment_link(self):
         user = User.objects.create_user(
-            username="testuser", password="testpassword", email="antar33@gmail.com"
+            username="testuser",
+            password="testpassword",
+            email="antar33@gmail.com",
         )
         self.client.force_authenticate(user)
         body = {}
         responses.add(
             responses.POST,
             "https://api.monobank.ua/api/merchant/invoice/create",
-            json={"invoiceId": 25, "pageUrl": "https://pay.mbnk.biz/123456iDfJtqzNXqC"},
+            json={
+                "invoiceId": 25,
+                "pageUrl": "https://pay.mbnk.biz/123456iDfJtqzNXqC",
+            },
         )
         response = self.client.post(
             "/api/cart/", json.dumps(body), content_type="application/json"

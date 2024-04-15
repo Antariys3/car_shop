@@ -16,22 +16,25 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
-from carshop.views import (
+from carshop.views.views import (
+    CarDetailView,
+    CarsShopView,
+    CartView,
+    CustomSignupView,
+    DeleteOrderView,
+    MyListedCarsView,
+    PaymentStatusDetailsView,
+    PaymentStatusView,
+    SellCarDeleteView,
+    SellCarUpdateView,
     SellCarView,
     logout_view,
-    CarsShopView,
-    CarDetailView,
-    CartView,
-    PaymentStatusView,
-    PaymentStatusDetailsView,
-    CustomSignupView,
-    MyListedCarsView,
-    SellCarUpdateView,
-    SellCarDeleteView,
-    DeleteOrderView,
 )
+
+# TODO this file should be split and routs should be imported from different
+#  apps and not placed all in this file.
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -40,21 +43,12 @@ urlpatterns = [
     path("car/<int:car_id>/", CarDetailView.as_view(), name="car_detail"),
     path("cart/", CartView.as_view(), name="cart"),
     path(
-        "order/<int:order_id>/delete/", DeleteOrderView.as_view(), name="delete_order"
+        "order/<int:order_id>/delete/",
+        DeleteOrderView.as_view(),
+        name="delete_order",
     ),
     path("sell_cars/", SellCarView.as_view(), name="sell_cars"),
     path("my_listed_cars/", MyListedCarsView.as_view(), name="my_listed_cars"),
-    path(
-        "sell_car_update/<int:pk>/", SellCarUpdateView.as_view(), name="sell_car_update"
-    ),
-    path(
-        "sell_car_delete/<int:pk>/", SellCarDeleteView.as_view(), name="sell_car_delete"
-    ),
-    path("logout", logout_view, name="logout"),
-    path("login/", include("allauth.account.urls"), name="account_login"),
-    path("accounts/", include("allauth.urls")),
-    path("accounts/", include("allauth.socialaccount.urls")),
-    path("signup/", CustomSignupView.as_view(), name="custom_signup"),
     path("payment_status/", PaymentStatusView.as_view(), name="payment_status"),
     path(
         "payment_status_details/<int:order_id>/",
@@ -62,3 +56,28 @@ urlpatterns = [
         name="payment_status_details",
     ),
 ]
+
+urlpatterns.append(
+    [
+        path(
+            "sell_car_update/<int:pk>/",
+            SellCarUpdateView.as_view(),
+            name="sell_car_update",
+        ),
+        path(
+            "sell_car_delete/<int:pk>/",
+            SellCarDeleteView.as_view(),
+            name="sell_car_delete",
+        ),
+    ]
+)
+
+urlpatterns.append(
+    [
+        path("accounts/", include("allauth.urls")),
+        path("accounts/", include("allauth.socialaccount.urls")),
+        path("login/", include("allauth.account.urls"), name="account_login"),
+        path("logout", logout_view, name="logout"),
+        path("signup/", CustomSignupView.as_view(), name="custom_signup"),
+    ]
+)

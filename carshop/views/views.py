@@ -4,40 +4,41 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView, ListView, DetailView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import DeleteView, UpdateView
 from rest_framework.reverse import reverse
-
+# TODO above lib is not in requirements
 from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
-from .forms import SellCarsFormView, CustomSignupForm
-from .models import CarType, OrderQuantity, Car
-from .models import Order
+
+from ..forms import CustomSignupForm, SellCarsFormView
+from ..models import Car, CarType, Order, OrderQuantity
+from .utils import cars_counter, img_finder, order_saver, reset_car
 
 
+# TODO make below view class based
 def logout_view(request):
     logout(request)
     return redirect("cars_list")
 
 
 class CarsShopView(ListView):
-    paginate_by = 12
     model = Car
     template_name = "cars_list.html"
     context_object_name = "cars"
+    paginate_by = 12
 
     def get_queryset(self):
-        return Car.objects.filter(blocked_by_order=None, owner=None).select_related(
-            "car_type"
-        )
+        return Car.objects.filter(
+            blocked_by_order=None, owner=None
+        ).select_related("car_type")
 
-    @method_decorator(login_required, name="dispatch")
     # processing the add to cart button
+    @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
 
         client = request.user
@@ -45,16 +46,9 @@ class CarsShopView(ListView):
         car = Car.objects.select_related("car_type").get(id=car_id)
 
         order = Order.objects.filter(client_id=client.id, is_paid=False).first()
-        if order:
-            OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
+        order_saver(order, client, car, Order, OrderQuantity)
 
-        else:
-            order = Order.objects.create(client=client)
-            OrderQuantity.objects.create(car_type=car.car_type, quantity=1, order=order)
-
-        car.block(order)
-        car.add_owner(client)
-
+        # TODO check if below line is required
         self.object_list = self.get_queryset()
         return self.render_to_response(self.get_context_data())
 
@@ -62,28 +56,20 @@ class CarsShopView(ListView):
 class CarDetailView(View):
     model = Car
     template_name = "car_detail.html"
-    not_found_template_name = "car_not_found.html"
 
     def get(self, request, *args, **kwargs):
         car_id = self.kwargs.get("car_id")
         car = Car.objects.filter(id=car_id).prefetch_related("car_type").first()
         if car is None:
-            return render(request, self.not_found_template_name)
-        cars_count = Car.objects.filter(
-            color=car.color,
-            year=car.year,
-            blocked_by_order=None,
-            owner=None,
-            car_type__name=car.car_type.name,
-            car_type__brand=car.car_type.brand,
-        ).count()
+            return render(request, "car_not_found.html")
+        cars_count = cars_counter(car)
         return render(
             request, self.template_name, {"car": car, "cars_count": cars_count}
         )
 
     @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
-        client = User.objects.filter(username=request.user).first()
+
         car_id = self.kwargs.get("car_id")
         quantity = int(request.POST.get("number"))
         car = Car.objects.select_related("car_type").get(id=car_id)
@@ -94,21 +80,11 @@ class CarDetailView(View):
             car_type__name=car.car_type.name,
             car_type__brand=car.car_type.brand,
         )[:quantity]
+
+        client = User.objects.filter(username=request.user).first()
         order = Order.objects.filter(client_id=client.id, is_paid=False).first()
         for car in cars:
-            if order:
-                OrderQuantity.objects.create(
-                    car_type=car.car_type, quantity=1, order=order
-                )
-
-            else:
-                order = Order.objects.create(client=client)
-                OrderQuantity.objects.create(
-                    car_type=car.car_type, quantity=1, order=order
-                )
-
-            car.block(order)
-            car.add_owner(client)
+            order_saver(order, client, car, Order, OrderQuantity)
         return redirect("cart")
 
 
@@ -118,10 +94,16 @@ class CartView(View):
 
     def get(self, request, *args, **kwargs):
         print("type Cart", type(request.user))
-        order = Order.objects.filter(is_paid=False, client_id=request.user).first()
-        if order is None:
+        order = Order.objects.filter(
+            is_paid=False, client_id=request.user
+        ).first()
+
+        if not order:
             return render(request, self.template_name, {"order": order})
-        cars = Car.objects.filter(blocked_by_order=order).select_related("car_type")
+
+        cars = Car.objects.filter(blocked_by_order=order).select_related(
+            "car_type"
+        )
         total_price = sum(car.car_type.price for car in cars)
         context = {
             "order": order,
@@ -144,12 +126,14 @@ class CartView(View):
 @method_decorator(login_required, name="dispatch")
 class PaymentStatusView(TemplateView):
     model = Order
-    template_name = "payment_state.html"
+    template_name = "payment/payment_state.html"
 
     def get(self, request, *args, **kwargs):
         owner = request.user
+
         if not owner:
             return render(request, self.template_name, {"order": owner})
+
         order = Order.objects.filter(client_id=owner)
         if not order:
             return render(request, self.template_name, {"order": order})
@@ -158,7 +142,7 @@ class PaymentStatusView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 class PaymentStatusDetailsView(TemplateView):
-    template_name = "payment_status_details.html"
+    template_name = "payment/payment_status_details.html"
 
     def get(self, request, *args, **kwargs):
         order_id = kwargs.get("order_id")
@@ -170,11 +154,7 @@ class PaymentStatusDetailsView(TemplateView):
                 "brand": order_quantity.car_type.brand,
                 "name": order_quantity.car_type.name,
                 "price": order_quantity.car_type.price,
-                "image": (
-                    order_quantity.car_type.image.url
-                    if order_quantity.car_type.image
-                    else None
-                ),
+                "image": img_finder(order_quantity),
             }
             for order_quantity in order_quantities
         ]
@@ -188,17 +168,20 @@ class PaymentStatusDetailsView(TemplateView):
 
 @method_decorator(login_required, name="dispatch")
 class DeleteOrderView(DetailView):
+
     def post(self, request, *args, **kwargs):
         order_id = self.kwargs.get("order_id")
+
         cars = Car.objects.filter(blocked_by_order=order_id)
-        for car in cars:
-            car.unblock()
-            car.remove_owner()
+        [reset_car(car) for car in cars]
+
         order = get_object_or_404(Order, id=order_id)
         order.delete()
+
         return redirect("cars_list")
 
 
+# TODO change below to form view
 @method_decorator(login_required, name="dispatch")
 class SellCarView(View):
     template_name = "sell_cars.html"
@@ -207,6 +190,7 @@ class SellCarView(View):
         form = SellCarsFormView()
         return render(request, self.template_name, {"form": form})
 
+    # TODO use form_valid method
     def post(self, request):
         form = SellCarsFormView(request.POST, request.FILES)
         if form.is_valid():
@@ -224,7 +208,10 @@ class SellCarView(View):
                     )
                     car_type.image.save(f"{image}", crop_image(image))
                     car = Car(
-                        car_type=car_type, color=color, year=year, seller=request.user
+                        car_type=car_type,
+                        color=color,
+                        year=year,
+                        seller=request.user,
                     )
                     car.save()
             except ValidationError as e:
@@ -243,24 +230,31 @@ class MyListedCarsView(ListView):
         list_cars_sell = Car.objects.filter(
             blocked_by_order=None, seller=request.user
         ).select_related("car_type")
-        return render(request, self.template_name, {"list_cars_sell": list_cars_sell})
+        return render(
+            request, self.template_name, {"list_cars_sell": list_cars_sell}
+        )
 
 
 @method_decorator(login_required, name="dispatch")
 class SellCarUpdateView(UpdateView):
     model = Car
     form_class = SellCarsFormView
-    template_name = "sell_car_update.html"
+    template_name = "sell_cars/sell_car_update.html"
 
     def get_queryset(self):
         return super().get_queryset().select_related("car_type")
 
     def get_object(self, queryset=None):
-        return get_object_or_404(Car, pk=self.kwargs["pk"], seller=self.request.user)
+        return get_object_or_404(
+            Car, pk=self.kwargs["pk"], seller=self.request.user
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         car = self.get_object()
+
+        # TODO send to form not initial_data but 'car' and then access required
+        # param inside the form
         initial_data = {
             "brand": car.car_type.brand,
             "name": car.car_type.name,
@@ -271,7 +265,9 @@ class SellCarUpdateView(UpdateView):
         }
 
         form = self.form_class(initial=initial_data)
-        context["image_url"] = car.car_type.image.url if car.car_type.image else None
+        context["image_url"] = (
+            car.car_type.image.url if car.car_type.image else None
+        )
         context["form"] = form
         return context
 
@@ -287,7 +283,6 @@ class SellCarUpdateView(UpdateView):
         image = request.FILES.get("image")
         if image:
             car_type_instance.image.save(image.name, crop_image(image))
-
         try:
             with transaction.atomic():
                 car_instance.save()
@@ -300,7 +295,7 @@ class SellCarUpdateView(UpdateView):
 @method_decorator(login_required, name="dispatch")
 class SellCarDeleteView(DeleteView):
     model = Car
-    template_name = "sell_car_delete.html"
+    template_name = "sell_cars/sell_car_delete.html"
     success_url = reverse_lazy("cars_list")
 
     def form_valid(self, form):

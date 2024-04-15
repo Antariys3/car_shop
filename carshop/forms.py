@@ -3,7 +3,7 @@ from datetime import datetime
 from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.forms import ModelForm
 
 from .models import CarType
@@ -61,7 +61,8 @@ class CustomSignupForm(SignupForm):
         label="Email", widget=forms.EmailInput(attrs={"class": "form-input"})
     )
     password1 = forms.CharField(
-        label="Password", widget=forms.PasswordInput(attrs={"class": "form-input"})
+        label="Password",
+        widget=forms.PasswordInput(attrs={"class": "form-input"}),
     )
     password2 = forms.CharField(
         label="Confirm Password",

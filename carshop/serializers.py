@@ -1,7 +1,8 @@
-from rest_framework import serializers
+# TODO library above is not in requirements.
 from django.contrib.auth.models import User
+from rest_framework import serializers
 
-from .models import Car, CarType, User, Order, OrderQuantity, Licence
+from .models import Car, CarType, Licence, Order, OrderQuantity, User
 
 
 class UserSerializer(serializers.ModelSerializer):

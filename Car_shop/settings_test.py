@@ -1,6 +1,6 @@
 from .settings import *
 
-
+# TODO this file to be deleted
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",

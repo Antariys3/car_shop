@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 from carshop.faker import fake
 
@@ -28,7 +28,10 @@ class Car(models.Model):
     color = models.CharField(max_length=50)
     year = models.IntegerField()
     blocked_by_order = models.ForeignKey(
-        "Order", on_delete=models.SET_NULL, null=True, related_name="reserved_cars"
+        "Order",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="reserved_cars",
     )
     owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="cars"
@@ -89,7 +92,9 @@ class Licence(models.Model):
 
 class Dealership(models.Model):
     name = models.CharField(max_length=50)
-    available_car_types = models.ManyToManyField(CarType, related_name="dealerships")
+    available_car_types = models.ManyToManyField(
+        CarType, related_name="dealerships"
+    )
     clients = models.ManyToManyField(User, related_name="dealerships")
 
     def __str__(self):
@@ -97,7 +102,9 @@ class Dealership(models.Model):
 
 
 class Order(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
+    client = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="orders"
+    )
     is_paid = models.BooleanField(default=False)
     invoice_url = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True)
