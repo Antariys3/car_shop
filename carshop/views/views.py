@@ -157,7 +157,7 @@ class DeleteOrderView(DetailView):
 
 @method_decorator(login_required, name="dispatch")
 class SellCarView(View):
-    template_name = "sell_cars.html"
+    template_name = "sell_cars/sell_cars.html"
 
     def get(self, request):
         form = SellCarsFormView()
@@ -192,7 +192,7 @@ class SellCarView(View):
 @method_decorator(login_required, name="dispatch")
 class MyListedCarsView(ListView):
     model = Car
-    template_name = "my_listed_cars.html"
+    template_name = "sell_cars/my_listed_cars.html"
     success_url = reverse_lazy("cars_list")
 
     def get(self, request, *args, **kwargs):
