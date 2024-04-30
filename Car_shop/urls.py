@@ -30,7 +30,7 @@ from carshop.views.views import (
     SellCarDeleteView,
     SellCarUpdateView,
     SellCarView,
-    logout_view,
+    CustomLogoutView,
 )
 
 urlpatterns = [
@@ -50,7 +50,7 @@ urlpatterns = [
     path(
         "sell_car_delete/<int:pk>/", SellCarDeleteView.as_view(), name="sell_car_delete"
     ),
-    path("logout", logout_view, name="logout"),
+    path("logout", CustomLogoutView.as_view(), name="logout"),
     path("login/", include("allauth.account.urls"), name="account_login"),
     path("accounts/", include("allauth.urls")),
     path("accounts/", include("allauth.socialaccount.urls")),

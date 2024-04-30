@@ -1,5 +1,5 @@
 from allauth.account.views import SignupView
-from django.contrib.auth import logout
+from django.contrib.auth.views import LogoutView
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -16,11 +16,6 @@ from carshop.images_processing import crop_image
 from carshop.invoices import create_invoice
 from carshop.models import Car, CarType, Order, OrderQuantity
 from carshop.views.utils import order_saver, cars_counter, img_finder, reset_car
-
-
-def logout_view(request):
-    logout(request)
-    return redirect("cars_list")
 
 
 class CarsShopView(ListView):
@@ -88,7 +83,6 @@ class CartView(View):
     template_name = "cart.html"
 
     def get(self, request, *args, **kwargs):
-        print("type Cart", type(request.user))
         order = Order.objects.filter(is_paid=False, client_id=request.user).first()
         if order is None:
             return render(request, self.template_name, {"order": order})
@@ -274,3 +268,7 @@ class SellCarDeleteView(DeleteView):
 
 class CustomSignupView(SignupView):
     form_class = CustomSignupForm
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('cars_list')
