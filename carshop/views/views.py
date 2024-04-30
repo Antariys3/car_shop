@@ -1,6 +1,6 @@
 from allauth.account.views import SignupView
-from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LogoutView
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
@@ -18,13 +18,7 @@ from carshop.models import Car, CarType, Order, OrderQuantity
 from carshop.views.utils import order_saver, cars_counter, img_finder, reset_car
 
 
-def logout_view(request):
-    logout(request)
-    return redirect("cars_list")
-
-
 class CarsShopView(ListView):
-
     model = Car
     template_name = "cars_list.html"
     context_object_name = "cars"
@@ -38,7 +32,6 @@ class CarsShopView(ListView):
     # processing the add to cart button
     @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
-
         client = request.user
         car_id = request.POST.get("car_id")
         car = Car.objects.select_related("car_type").get(id=car_id)
@@ -88,7 +81,6 @@ class CartView(View):
     template_name = "cart.html"
 
     def get(self, request, *args, **kwargs):
-        print("type Cart", type(request.user))
         order = Order.objects.filter(is_paid=False, client_id=request.user).first()
         if order is None:
             return render(request, self.template_name, {"order": order})
@@ -102,7 +94,6 @@ class CartView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-
         order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
         cars = Car.objects.filter(
@@ -166,7 +157,7 @@ class DeleteOrderView(DetailView):
 
 @method_decorator(login_required, name="dispatch")
 class SellCarView(View):
-    template_name = "sell_cars.html"
+    template_name = "sell_cars/sell_cars.html"
 
     def get(self, request):
         form = SellCarsFormView()
@@ -201,7 +192,7 @@ class SellCarView(View):
 @method_decorator(login_required, name="dispatch")
 class MyListedCarsView(ListView):
     model = Car
-    template_name = "my_listed_cars.html"
+    template_name = "sell_cars/my_listed_cars.html"
     success_url = reverse_lazy("cars_list")
 
     def get(self, request, *args, **kwargs):
@@ -274,3 +265,7 @@ class SellCarDeleteView(DeleteView):
 
 class CustomSignupView(SignupView):
     form_class = CustomSignupForm
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy("cars_list")
