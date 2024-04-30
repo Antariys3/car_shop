@@ -1,6 +1,6 @@
 from allauth.account.views import SignupView
-from django.contrib.auth.views import LogoutView
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LogoutView
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,7 +19,6 @@ from carshop.views.utils import order_saver, cars_counter, img_finder, reset_car
 
 
 class CarsShopView(ListView):
-
     model = Car
     template_name = "cars_list.html"
     context_object_name = "cars"
@@ -33,7 +32,6 @@ class CarsShopView(ListView):
     # processing the add to cart button
     @method_decorator(login_required, name="dispatch")
     def post(self, request, *args, **kwargs):
-
         client = request.user
         car_id = request.POST.get("car_id")
         car = Car.objects.select_related("car_type").get(id=car_id)
@@ -96,7 +94,6 @@ class CartView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-
         order_id = request.POST.get("order_id")
         order = Order.objects.get(id=order_id)
         cars = Car.objects.filter(
@@ -271,4 +268,4 @@ class CustomSignupView(SignupView):
 
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('cars_list')
+    next_page = reverse_lazy("cars_list")
