@@ -1,10 +1,10 @@
+import json
+
+import responses
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework.test import APITransactionTestCase
-import json
-import responses
+from rest_framework.test import APITestCase, APITransactionTestCase
 
 
 class CustomObtainAuthTokenTest(APITestCase):
@@ -19,7 +19,8 @@ class CustomObtainAuthTokenTest(APITestCase):
         response = self.client.post(url, data, format="json")
         assert response.status_code == status.HTTP_200_OK
         assert "token" in response.json()
-        assert response.json()["token"] != ""  # Check that the token is not empty
+        # Check that the token is not empty
+        assert response.json()["token"] != ""
 
     def setUp(self):
         self.user = User.objects.create_user(

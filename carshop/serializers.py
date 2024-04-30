@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 
-from .models import Car, CarType, User, Order, OrderQuantity, Licence
+from .models import Car, CarType, User, Order, OrderQuantity
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,10 +39,4 @@ class OrderQuantitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderQuantity
-        fields = "__all__"
-
-
-class LicenceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Licence
         fields = "__all__"

@@ -1,23 +1,18 @@
 import django_filters.rest_framework
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import filters
+from rest_framework import permissions, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework import filters
 
 from carshop.invoices import create_invoice, verify_signature
-from carshop.serializers import (
-    CarSerializer,
-    OrderSerializer,
-)
-from .models import Order, OrderQuantity, Car
+from carshop.serializers import CarSerializer, OrderSerializer
+from .models import Car, Order, OrderQuantity
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -98,7 +93,7 @@ class CartAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # view cart with cars
+        # views cart with cars
         owner = User.objects.filter(email=request.user.email).first()
         order = Order.objects.filter(is_paid=False, client_id=owner).first()
         if order is None:
