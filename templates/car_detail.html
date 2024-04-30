@@ -32,8 +32,8 @@
 
                 <script>
                     document.getElementById('form_buying_product').addEventListener('submit', function (event) {
-                        var numberInput = document.getElementById('number');
-                        var carsCount = {{ cars_count }};
+                        const numberInput = document.getElementById('number');
+                        const carsCount = {{ cars_count }};
 
                         if (numberInput.value < 1 || numberInput.value > carsCount) {
                             alert('Please enter the correct quantity of cars.');

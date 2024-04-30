@@ -16,21 +16,21 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
-from carshop.views import (
+from carshop.views.views import (
+    CarDetailView,
+    CarsShopView,
+    CartView,
+    CustomSignupView,
+    DeleteOrderView,
+    MyListedCarsView,
+    PaymentStatusDetailsView,
+    PaymentStatusView,
+    SellCarDeleteView,
+    SellCarUpdateView,
     SellCarView,
     logout_view,
-    CarsShopView,
-    CarDetailView,
-    CartView,
-    PaymentStatusView,
-    PaymentStatusDetailsView,
-    CustomSignupView,
-    MyListedCarsView,
-    SellCarUpdateView,
-    SellCarDeleteView,
-    DeleteOrderView,
 )
 
 urlpatterns = [

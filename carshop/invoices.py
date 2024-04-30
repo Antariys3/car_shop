@@ -5,18 +5,13 @@ import ecdsa
 import requests
 from django.conf import settings
 
+from carshop.constants import PUBLIC_KEY, REDIRECT_URL
 from carshop.models import Order
-
-PUBLIC_KEY = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFc05mWXpNR1hIM2VXVHkzWnFuVzVrM3luVG5CYgpnc3pXWnhkOStObEtveDUzbUZEVTJONmU0RlBaWmsvQmhqamgwdTljZjVFL3JQaU1EQnJpajJFR1h3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
-REDIRECT_URL = (
-    "https://boiling-fortress-51276-88bb58822abe.herokuapp.com/payment_status/"
-)
 
 
 def verify_signature(request):
     x_sing_base64 = request.headers["X-Sign"]
     body_test = request.body
-    print(body_test)
     public_key_bytes = base64.b64decode(PUBLIC_KEY)
     signature_bytes = base64.b64decode(x_sing_base64)
     pub_key = ecdsa.VerifyingKey.from_pem(public_key_bytes.decode())
@@ -27,7 +22,6 @@ def verify_signature(request):
         sigdecode=ecdsa.util.sigdecode_der,
         hashfunc=hashlib.sha256,
     )
-    print(ok)
     if not ok:
         raise Exception("Signature is not valid")
 

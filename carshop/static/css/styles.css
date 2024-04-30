@@ -8,6 +8,10 @@ a {
     text-decoration: none;
 }
 
+.margin-btm-0 {
+    margin-bottom: 0px;
+}
+
 .custom-container {
     max-width: 30%;
     padding-left: 0;
