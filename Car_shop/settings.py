@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "carshop.apps.CarshopConfig",
+    "carshop.carshop_config.CarshopConfig",
     "bootstrap5",
     # The Django apps are required for allauth:
     "allauth",
