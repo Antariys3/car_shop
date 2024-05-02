@@ -21,7 +21,7 @@ class SellCarsFormView(ModelForm):
         label="Year",
         widget=forms.NumberInput(attrs={"class": "form-control"}),
         validators=[
-            MinValueValidator(2000, message="Year must be at least 2000"),
+            MinValueValidator(1938, message="Year must be at least 1938"),
             MaxValueValidator(
                 datetime.today().year, message="Year cannot be in the future"
             ),

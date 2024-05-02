@@ -150,4 +150,4 @@ venv_l/
 venv_p
 /venv_l/
 /templates/registration/test.html
-
+Makefile
